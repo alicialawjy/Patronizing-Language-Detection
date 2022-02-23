@@ -176,7 +176,7 @@ def train_epoch(
 
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
-    targets = d["targets"].float().to(device)
+    targets = d["targets"].to(device)
 
     outputs = model(
       input_ids=input_ids,
@@ -186,20 +186,23 @@ def train_epoch(
     _, preds = torch.max(outputs, dim=1)
     preds = preds.reshape(-1,1).float()
     # print(f'outputs: {outputs.shape}')
-    # print(f'preds: {preds.shape}')
-    # print(f'target: {targets.shape}')
-
-    loss = loss_fn(preds, targets)
-    loss.requires_grad = True
+    # print(f'preds: {preds}')
+    targets = targets.squeeze()
+    # print(f'target: {targets}')
+    # print(f'target shape: {targets.shape}')
+    loss = loss_fn(outputs, targets)
+    # loss.requires_grad = True
     correct_predictions += torch.sum(preds == targets)
     losses.append(loss.item())
-
-    f1_scores.append(f1_score(targets, preds))
+    print(loss.item())
+    print(loss)
+    target_detach = targets.cpu().detach().numpy()
+    preds_detach = preds.cpu().detach().numpy()
+    f1_scores.append(f1_score(target_detach, preds_detach))
 
     loss.backward()
     nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
-    
 
   return correct_predictions.double() / n_examples, np.mean(losses), np.mean(f1_scores)
 
@@ -218,11 +221,14 @@ def evaluate(loss_fn):
         )
 
         _, preds = torch.max(outputs, dim=1)
-        loss = loss_fn(preds, targets)
+        preds = preds.reshape(-1,1).float()
+        targets = targets.squeeze()
+        loss = loss_fn(outputs, targets)
         loss.requires_grad = True
         losses.append(loss.item())
-
-        f1_scores.append(f1_score(targets, preds))
+        target_detach = targets.cpu().detach().numpy()
+        preds_detach = preds.cpu().detach().numpy()
+        f1_scores.append(f1_score(target_detach, preds_detach))
 
         correct_predictions += torch.sum(preds == targets)
   return correct_predictions.double() / len(test_data_loader), np.mean(losses), np.mean(f1_scores)
