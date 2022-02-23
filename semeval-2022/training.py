@@ -184,21 +184,23 @@ def train_epoch(
     )
 
     _, preds = torch.max(outputs, dim=1)
-    preds = preds.reshape(-1,1).float()
+    preds = preds.squeeze()
     # print(f'outputs: {outputs.shape}')
-    # print(f'preds: {preds}')
+    # print(f'preds: {preds.shape}')
     targets = targets.squeeze()
     # print(f'target: {targets}')
     # print(f'target shape: {targets.shape}')
     loss = loss_fn(outputs, targets)
     # loss.requires_grad = True
     correct_predictions += torch.sum(preds == targets)
+    # print(correct_predictions)
     losses.append(loss.item())
     print(loss.item())
-    print(loss)
+    print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
+
     target_detach = targets.cpu().detach().numpy()
     preds_detach = preds.cpu().detach().numpy()
-    f1_scores.append(f1_score(target_detach, preds_detach))
+    f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
 
     loss.backward()
     nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -208,6 +210,7 @@ def train_epoch(
 
 def evaluate(loss_fn):
   losses = []
+  correct_predictions = 0
   f1_scores = []
   with torch.no_grad():
       for test_data in test_data_loader:
@@ -221,17 +224,17 @@ def evaluate(loss_fn):
         )
 
         _, preds = torch.max(outputs, dim=1)
-        preds = preds.reshape(-1,1).float()
+        preds = preds.squeeze()
         targets = targets.squeeze()
         loss = loss_fn(outputs, targets)
         loss.requires_grad = True
         losses.append(loss.item())
         target_detach = targets.cpu().detach().numpy()
         preds_detach = preds.cpu().detach().numpy()
-        f1_scores.append(f1_score(target_detach, preds_detach))
+        f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
 
         correct_predictions += torch.sum(preds == targets)
-  return correct_predictions.double() / len(test_data_loader), np.mean(losses), np.mean(f1_scores)
+  return correct_predictions.double() / len(df_test), np.mean(losses), np.mean(f1_scores)
 
 EPOCHS = 3
 
