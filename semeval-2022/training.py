@@ -95,6 +95,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
+      max_length = 512,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -220,7 +221,7 @@ def evaluate(loss_fn):
 
 EPOCHS = 3
 
-model = SentimentClassifier(n_classes=2)
+model = SentimentClassifier(n_classes=2).to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 loss_fn = nn.CrossEntropyLoss().to(device)
 PATH = "finetuned_roberta_model.pth"
