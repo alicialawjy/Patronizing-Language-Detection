@@ -236,43 +236,44 @@ def evaluate(loss_fn):
         correct_predictions += torch.sum(preds == targets)
   return correct_predictions.double() / len(df_test), np.mean(losses), np.mean(f1_scores)
 
-EPOCHS = 3
+if __name__ == "__main__":
+  EPOCHS = 3
 
-model = SentimentClassifier(n_classes=2).to(device)
-optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
-loss_fn = nn.CrossEntropyLoss().to(device)
-PATH = "finetuned_roberta_model.pth"
+  model = SentimentClassifier(n_classes=2).to(device)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+  loss_fn = nn.CrossEntropyLoss().to(device)
+  PATH = "finetuned_roberta_model.pth"
 
 
-# Main training loop
-train_accuracies = []
-train_losses = []
-train_f1 = []
+  # Main training loop
+  train_accuracies = []
+  train_losses = []
+  train_f1 = []
 
-test_accuracies = []
-test_losses = []
-test_f1 = []
+  test_accuracies = []
+  test_losses = []
+  test_f1 = []
 
-for epoch in tqdm(range(EPOCHS)):
+  for epoch in tqdm(range(EPOCHS)):
 
-  print(f'Epoch {epoch + 1}/{EPOCHS}')
-  print('-' * 10)
+    print(f'Epoch {epoch + 1}/{EPOCHS}')
+    print('-' * 10)
 
-  train_acc, train_loss, train_f1 = train_epoch(
-    model,
-    train_data_loader,
-    loss_fn,
-    optimizer,
-    device,
-    n_examples = len(df_train)
-  )
-  print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}, Train F1 {train_f1}')
+    train_acc, train_loss, train_f1 = train_epoch(
+      model,
+      train_data_loader,
+      loss_fn,
+      optimizer,
+      device,
+      n_examples = len(df_train)
+    )
+    print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}, Train F1 {train_f1}')
 
-  test_acc, test_loss, test_f1 = evaluate(loss_fn)
-  print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}, Train F1 {test_f1}')
+    test_acc, test_loss, test_f1 = evaluate(loss_fn)
+    print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}, Train F1 {test_f1}')
 
-torch.save(model.state_dict(), PATH)
+  torch.save(model.state_dict(), PATH)
 
-print(f'Final Train F1 {train_f1}')
-print(f'Final Test F1 {test_f1}')
+  print(f'Final Train F1 {train_f1}')
+  print(f'Final Test F1 {test_f1}')
 

@@ -44,4 +44,9 @@ df_test, df_val = train_test_split(
 df_train.shape, df_val.shape, df_test.shape
 
 model = SentimentClassifier(2)
+# print(model)
+
+model.load_state_dict(torch.load("finetuned_roberta_model.pth"))
+model.eval()
+
 print(model)
