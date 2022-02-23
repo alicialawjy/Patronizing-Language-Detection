@@ -95,6 +95,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
+      max_length = 200,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -171,9 +172,11 @@ def train_epoch(
   f1_scores = []
 
   for d in data_loader:
+    optimizer.zero_grad()
+
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
-    targets = d["targets"].to(device)
+    targets = d["targets"].float().to(device)
 
     outputs = model(
       input_ids=input_ids,
@@ -181,8 +184,13 @@ def train_epoch(
     )
 
     _, preds = torch.max(outputs, dim=1)
-    loss = loss_fn(outputs, targets)
+    preds = preds.reshape(-1,1).float()
+    # print(f'outputs: {outputs.shape}')
+    # print(f'preds: {preds.shape}')
+    # print(f'target: {targets.shape}')
 
+    loss = loss_fn(preds, targets)
+    loss.requires_grad = True
     correct_predictions += torch.sum(preds == targets)
     losses.append(loss.item())
 
@@ -191,7 +199,7 @@ def train_epoch(
     loss.backward()
     nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
-    optimizer.zero_grad()
+    
 
   return correct_predictions.double() / n_examples, np.mean(losses), np.mean(f1_scores)
 
@@ -208,9 +216,10 @@ def evaluate(loss_fn):
           input_ids=input_ids,
           attention_mask=attention_mask
         )
-        _, preds = torch.max(outputs, dim=1)
 
-        loss = loss_fn(outputs, targets)
+        _, preds = torch.max(outputs, dim=1)
+        loss = loss_fn(preds, targets)
+        loss.requires_grad = True
         losses.append(loss.item())
 
         f1_scores.append(f1_score(targets, preds))
@@ -220,7 +229,7 @@ def evaluate(loss_fn):
 
 EPOCHS = 3
 
-model = SentimentClassifier(n_classes=2)
+model = SentimentClassifier(n_classes=2).to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
 loss_fn = nn.CrossEntropyLoss().to(device)
 PATH = "finetuned_roberta_model.pth"
