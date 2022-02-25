@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 import sys
 
 try:
@@ -39,3 +39,4 @@ for ls_a in actual:
     #predictions.extend(i)
 
 print(classification_report(actual_list,predictions ))
+print(confusion_matrix(actual_list,predictions))
