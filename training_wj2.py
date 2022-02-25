@@ -17,7 +17,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, classification_report
 from torch.utils.data import Dataset, DataLoader
-import sys
+
 
 """### Dataloader"""
 
@@ -74,10 +74,8 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 300)
+    self.out = nn.Linear(768, n_classes)
     self.out_activation = nn.ReLU()
-    self.out2 = nn.Linear(300, n_classes)
-    self.out_activation2 = nn.ReLU()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -86,11 +84,9 @@ class SentimentClassifier(nn.Module):
     )
 
     output = self.drop(output[1])
-    output = self.out(output)
-    output = self.out_activation(output)
-    output = self.out(output)
-    output = self.out_activation(output)
-    return output
+    output2 = self.out(output)
+    output3 = self.out_activation(output2)
+    return output3
 
 """## Training"""
 
@@ -158,7 +154,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_results.csv')
+    df.to_csv('output-files/train_results2.csv')
   except:
     print('Fail to save')
 
@@ -202,7 +198,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_results.csv')
+      df.to_csv('output-files/eval_results2.csv')
     except:
       print('Fail to save')
 
