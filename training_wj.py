@@ -75,6 +75,7 @@ class SentimentClassifier(nn.Module):
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.3)
     self.out = nn.Linear(768, n_classes)
+    self.out_activation = nn.Sigmoid()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -83,7 +84,9 @@ class SentimentClassifier(nn.Module):
     )
 
     output = self.drop(output[1])
-    return self.out(output)
+    output2 = self.out(output)
+    output3 = self.out_activation(output2)
+    return output3
 
 """## Training"""
 
