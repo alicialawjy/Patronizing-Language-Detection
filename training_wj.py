@@ -258,7 +258,7 @@ if __name__ == "__main__":
   EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
-  optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
   loss_fn = nn.CrossEntropyLoss().to(device)
 
   # Main training loop
