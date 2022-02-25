@@ -252,7 +252,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
+  EPOCHS = 100
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
