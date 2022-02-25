@@ -73,9 +73,9 @@ class SentimentClassifier(nn.Module):
     super(SentimentClassifier, self).__init__()
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
-    self.drop = nn.Dropout(p=0.3)
+    self.drop = nn.Dropout(p=0.1)
     self.out = nn.Linear(768, n_classes)
-    self.out_activation = nn.Sigmoid()
+    self.out_activation = nn.ReLU()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -133,7 +133,7 @@ def train_epoch(
     # print(correct_predictions)
     losses.append(loss.item())
     print(loss.item())
-    print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
+    #print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
 
     target_detach = targets.cpu().detach().numpy()
     preds_detach = preds.cpu().detach().numpy()
@@ -255,7 +255,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 100
+  EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
