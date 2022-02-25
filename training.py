@@ -18,13 +18,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, classification_report
 from torch.utils.data import Dataset, DataLoader
 
-# """### Sample text to visualise tokenisation"""
-
-# sample_txt = 'Hello! I love that you are so poor.'
-# tokens_sample = tokenizer.tokenize(sample_txt)
-# token_ids = tokenizer.convert_tokens_to_ids(tokens_sample)
-
-# """Then, we do embedding on the tokens. """
 
 """### Dataloader"""
 
@@ -92,9 +85,7 @@ class SentimentClassifier(nn.Module):
     output = self.drop(output[1])
     return self.out(output)
 
-"""## Training
-
-"""
+"""## Training"""
 
 def train_epoch(
   model,
@@ -107,7 +98,6 @@ def train_epoch(
   model = model.train()
   full_preds = []
   full_target = []
-
   losses = []
   correct_predictions = 0
   f1_scores = []
@@ -161,20 +151,19 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('train_results.csv')
+    df.to_csv('output-files/train_results.csv')
   except:
     print('Fail to save')
 
-  return correct_predictions.double() / n_examples, np.mean(losses), np.mean(f1_scores)
+  return correct_predictions.double() / n_examples, np.mean(losses)
 
-def evaluate(loss_fn):
-
-  losses = []
-  correct_predictions = 0
-  f1_scores = []
+def evaluate(loss_fn, test_data_loader):
   with torch.no_grad():
     eval_preds = []
     eval_target = []
+    losses = []
+    correct_predictions = 0
+
     for test_data in test_data_loader:
       input_ids = test_data["input_ids"].to(device)
       attention_mask = test_data["attention_mask"].to(device)
@@ -206,11 +195,11 @@ def evaluate(loss_fn):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('eval_results.csv')
+      df.to_csv('output-files/eval_results.csv')
     except:
       print('Fail to save')
 
-  return correct_predictions.double() / len(df_test), np.mean(losses), np.mean(f1_scores)
+  return correct_predictions.double() / len(df_test), np.mean(losses)
 
 if __name__ == "__main__":
 
@@ -238,8 +227,8 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('df_downsample.csv', index_col=0)
-  df_test = pd.read_csv('df_test.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
   df_train = df_train.sample(frac=1).reset_index(drop=True)
@@ -250,8 +239,9 @@ if __name__ == "__main__":
     random_state = RANDOM_SEED
   )
   
-  print(df_test.describe())
-  print(df_val.describe())
+  print(f"train {df_train['label'].value_counts()}")
+  print(f"test {df_test['label'].value_counts()}")
+  print(f"val {df_val['label'].value_counts()}")
 
   # Data Loader
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
@@ -282,7 +272,7 @@ if __name__ == "__main__":
     print(f'Epoch {epoch + 1}/{EPOCHS}')
     print('-' * 10)
 
-    train_acc, train_loss, train_f1 = train_epoch(
+    train_acc, train_loss = train_epoch(
       model,
       train_data_loader,
       loss_fn,
@@ -290,14 +280,14 @@ if __name__ == "__main__":
       device,
       n_examples = len(df_train)
     )
-    print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}, Train F1 {train_f1}')
+    print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
 
-    test_acc, test_loss, test_f1 = evaluate(loss_fn)
-    print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}, Train F1 {test_f1}')
+    test_acc, test_loss = evaluate(loss_fn, test_data_loader)
+    print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
   PATH = "finetuned_roberta_model_downsample.pth"
   torch.save(model.state_dict(), PATH)
 
-  print(f'Final Train F1 {train_f1}')
-  print(f'Final Test F1 {test_f1}')
+  # print(f'Final Train F1 {train_f1}')
+  # print(f'Final Test F1 {test_f1}')
 
