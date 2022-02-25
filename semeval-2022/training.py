@@ -15,63 +15,16 @@ from dont_patronize_me import DontPatronizeMe
 import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, classification_report
 from torch.utils.data import Dataset, DataLoader
 
-RANDOM_SEED = 42
+# """### Sample text to visualise tokenisation"""
 
-dpm = DontPatronizeMe('.', '.')
-dpm = DontPatronizeMe('.', 'dontpatronizeme_pcl.tsv')
+# sample_txt = 'Hello! I love that you are so poor.'
+# tokens_sample = tokenizer.tokenize(sample_txt)
+# token_ids = tokenizer.convert_tokens_to_ids(tokens_sample)
 
-dpm.load_task1()
-
-dpm2 = DontPatronizeMe('.', '.')
-dpm2 = DontPatronizeMe('.', 'dontpatronizeme_categories.tsv')
-
-dpm2.load_task2()
-
-df = dpm.train_task1_df
-df_cate = dpm2.train_task2_df
-
-PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
-tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
-
-"""### Sample text to visualise tokenisation"""
-
-sample_txt = 'Hello! I love that you are so poor.'
-tokens_sample = tokenizer.tokenize(sample_txt)
-token_ids = tokenizer.convert_tokens_to_ids(tokens_sample)
-
-"""Then, we do embedding on the tokens. """
-
-class SentimentClassifier(nn.Module):
-  def __init__(self, n_classes):
-    super(SentimentClassifier, self).__init__()
-    self.bert = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME)
-    self.drop = nn.Dropout(p=0.3)
-    self.out = nn.Linear(self.bert.config.hidden_size, n_classes)
-
-  def forward(self, input_ids, attention_mask):
-    _, pooled_output = self.bert(
-      input_ids=input_ids,
-      attention_mask=attention_mask
-    )
-    output = self.drop(pooled_output)
-    return self.out(output)
-
-df_train, df_test = train_test_split(
-  df,
-  test_size=0.3,
-  random_state = RANDOM_SEED
-)
-
-df_test, df_val = train_test_split(
-  df_test,
-  test_size=0.5,
-  random_state = RANDOM_SEED
-)
-
-df_train.shape, df_val.shape, df_test.shape
+# """Then, we do embedding on the tokens. """
 
 """### Dataloader"""
 
@@ -122,20 +75,6 @@ def create_data_loader(df, tokenizer, batch_size):
     num_workers=2
   )
 
-BATCH_SIZE = 32
-train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
-test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
-val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
-
-"""# Classification"""
-
-GPU = True
-if GPU:
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-else:
-  device = torch.device("cpu")
-print(f"Using {device}")
-
 class SentimentClassifier(nn.Module):
   def __init__(self, n_classes):
     super(SentimentClassifier, self).__init__()
@@ -166,10 +105,15 @@ def train_epoch(
   n_examples
 ):
   model = model.train()
+  full_preds = []
+  full_target = []
 
   losses = []
   correct_predictions = 0
   f1_scores = []
+
+  for param in model.transformer.parameters():
+    param.requires_grad = False 
 
   for d in data_loader:
     optimizer.zero_grad()
@@ -200,50 +144,129 @@ def train_epoch(
 
     target_detach = targets.cpu().detach().numpy()
     preds_detach = preds.cpu().detach().numpy()
-    f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
+    full_preds.append(preds_detach.astype(int))
+    full_target.append(target_detach.astype(int))
+    
+    # print(target_detach.astype(int))
+    # print(preds_detach.astype(int))
+    # f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
 
     loss.backward()
     nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
 
+  full_target = np.array(full_target).flatten()
+  full_preds = np.array(full_preds).flatten()
+  # print(classification_report(full_target, full_preds))
+  train_results = {"pred": full_preds, "actual": full_target}
+  df = pd.DataFrame(train_results)
+  try:
+    df.to_csv('train_results.csv')
+  except:
+    print('Fail to save')
+
   return correct_predictions.double() / n_examples, np.mean(losses), np.mean(f1_scores)
 
 def evaluate(loss_fn):
+
   losses = []
   correct_predictions = 0
   f1_scores = []
   with torch.no_grad():
-      for test_data in test_data_loader:
-        input_ids = test_data["input_ids"].to(device)
-        attention_mask = test_data["attention_mask"].to(device)
-        targets = test_data["targets"].to(device)
+    eval_preds = []
+    eval_target = []
+    for test_data in test_data_loader:
+      input_ids = test_data["input_ids"].to(device)
+      attention_mask = test_data["attention_mask"].to(device)
+      targets = test_data["targets"].to(device)
 
-        outputs = model(
-          input_ids=input_ids,
-          attention_mask=attention_mask
-        )
+      outputs = model(
+        input_ids=input_ids,
+        attention_mask=attention_mask
+      )
 
-        _, preds = torch.max(outputs, dim=1)
-        preds = preds.squeeze()
-        targets = targets.squeeze()
-        loss = loss_fn(outputs, targets)
-        loss.requires_grad = True
-        losses.append(loss.item())
-        target_detach = targets.cpu().detach().numpy()
-        preds_detach = preds.cpu().detach().numpy()
-        f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
+      _, preds = torch.max(outputs, dim=1)
+      preds = preds.squeeze()
+      targets = targets.squeeze()
+      loss = loss_fn(outputs, targets)
+      loss.requires_grad = True
+      losses.append(loss.item())
+      target_detach = targets.cpu().detach().numpy()
+      preds_detach = preds.cpu().detach().numpy()
 
-        correct_predictions += torch.sum(preds == targets)
+      eval_preds.append(preds_detach.astype(int))
+      eval_target.append(target_detach.astype(int))
+  
+      # print(classification_report(target_detach.astype(int), preds_detach.astype(int)))
+      correct_predictions += torch.sum(preds == targets)
+
+    eval_target = np.array(eval_target).flatten()
+    eval_preds = np.array(eval_preds).flatten()
+    # print(classification_report(eval_target, eval_preds))
+    eval_results = {"pred": eval_preds, "actual": eval_target}
+    df = pd.DataFrame(eval_results)
+    try:
+      df.to_csv('eval_results.csv')
+    except:
+      print('Fail to save')
+
   return correct_predictions.double() / len(df_test), np.mean(losses), np.mean(f1_scores)
 
 if __name__ == "__main__":
-  EPOCHS = 3
+
+  # Fix Device
+  GPU = True
+  if GPU:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device("cpu")
+  print(f"Using {device}")
+
+  # Data
+  # dpm = DontPatronizeMe('.', '.')
+  # dpm = DontPatronizeMe('.', 'dontpatronizeme_pcl.tsv')
+
+  # dpm.load_task1()
+
+  # df = dpm.train_task1_df
+
+  RANDOM_SEED = 42
+  # df_train, df_test = train_test_split(
+  #   df,
+  #   test_size=0.3,
+  #   random_state = RANDOM_SEED
+  # )
+
+  # Read csv files
+  df_train = pd.read_csv('df_downsample.csv', index_col=0)
+  df_test = pd.read_csv('df_test.csv', index_col=0)
+
+  # Shuffle dataset
+  df_train = df_train.sample(frac=1).reset_index(drop=True)
+  df_test, df_val = train_test_split(
+    df_test,
+    test_size=0.5,
+    shuffle = True,
+    random_state = RANDOM_SEED
+  )
+  
+  print(df_test.describe())
+  print(df_val.describe())
+
+  # Data Loader
+  PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
+  tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
+
+  BATCH_SIZE = 32
+  train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
+  test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
+  val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
+
+  EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
   loss_fn = nn.CrossEntropyLoss().to(device)
-  PATH = "finetuned_roberta_model.pth"
-
 
   # Main training loop
   train_accuracies = []
@@ -272,6 +295,7 @@ if __name__ == "__main__":
     test_acc, test_loss, test_f1 = evaluate(loss_fn)
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}, Train F1 {test_f1}')
 
+  PATH = "finetuned_roberta_model_downsample.pth"
   torch.save(model.state_dict(), PATH)
 
   print(f'Final Train F1 {train_f1}')
