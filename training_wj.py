@@ -73,7 +73,7 @@ class SentimentClassifier(nn.Module):
     super(SentimentClassifier, self).__init__()
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
-    #self.drop = nn.Dropout(p=0.3)
+    self.drop = nn.Dropout(p=0.1)
     self.out = nn.Linear(768, n_classes)
     self.out_activation = nn.ReLU()
 
@@ -83,10 +83,10 @@ class SentimentClassifier(nn.Module):
       attention_mask=attention_mask
     )
 
-    #output = self.drop(output[1])
-    output = self.out(output)
-    output2 = self.out_activation(output)
-    return output2
+    output = self.drop(output[1])
+    output2 = self.out(output)
+    output3 = self.out_activation(output2)
+    return output3
 
 """## Training"""
 
