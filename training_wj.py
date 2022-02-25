@@ -75,6 +75,7 @@ class SentimentClassifier(nn.Module):
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.3)
     self.out = nn.Linear(768, n_classes)
+    self.out_activation = nn.Sigmoid()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -83,7 +84,9 @@ class SentimentClassifier(nn.Module):
     )
 
     output = self.drop(output[1])
-    return self.out(output)
+    output2 = self.out(output)
+    output3 = self.out_activation(output2)
+    return output3
 
 """## Training"""
 
@@ -227,7 +230,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
@@ -252,7 +255,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
+  EPOCHS = 100
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
