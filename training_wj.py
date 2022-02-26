@@ -161,10 +161,10 @@ def train_epoch(
   print("Mean losses: " + str(np.mean(losses)))
   mean_loss = np.mean(losses)
 
-  full_target = np.array(full_target, dtype=object).flatten()
-  full_preds = np.array(full_preds, dtype=object).flatten()
+  full_target = np.array(full_target).flatten()
+  full_preds = np.array(full_preds).flatten()
   # print(classification_report(full_target, full_preds))
-  train_results = {"pred": full_preds, "actual": full_target, "mean_loss": mean_loss}
+  train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
     df.to_csv('output-files/train_results.csv')
@@ -209,10 +209,10 @@ def evaluate(loss_fn, test_data_loader):
 
     #print("Mean losses: " + str(np.mean(losses)))
     mean_loss = np.mean(losses)
-    eval_target = np.array(eval_target, dtype=object).flatten()
-    eval_preds = np.array(eval_preds, dtype=object).flatten()
+    eval_target = np.array(eval_target).flatten()
+    eval_preds = np.array(eval_preds).flatten()
     # print(classification_report(eval_target, eval_preds))
-    eval_results = {"pred": eval_preds, "actual": eval_target, "mean_loss": mean_loss}
+    eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
       df.to_csv('output-files/eval_results.csv')
@@ -247,7 +247,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
@@ -267,7 +267,7 @@ if __name__ == "__main__":
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-  BATCH_SIZE = 32
+  BATCH_SIZE = 128
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
@@ -304,6 +304,7 @@ if __name__ == "__main__":
     print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
 
     test_acc, test_loss = evaluate(loss_fn, test_data_loader)
+    print("\n")
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
   PATH = "finetuned_roberta_model_downsample.pth"
