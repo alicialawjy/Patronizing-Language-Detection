@@ -53,7 +53,7 @@ class MyDataset(Dataset):
       'text': input,
       'input_ids': encoding['input_ids'].flatten(),
       'attention_mask': encoding['attention_mask'].flatten(),
-      'targets': torch.tensor(labels, dtype=torch.long)
+      'targets': torch.tensor(labels, dtype=torch.float)
     }
 
 def create_data_loader(df, tokenizer, batch_size):
