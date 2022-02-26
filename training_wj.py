@@ -17,7 +17,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, classification_report
 from torch.utils.data import Dataset, DataLoader
-
+import sys
 
 """### Dataloader"""
 
@@ -74,8 +74,10 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, n_classes)
+    self.out = nn.Linear(768, 300)
     self.out_activation = nn.ReLU()
+    self.out2 = nn.Linear(300, n_classes)
+    self.out_activation2 = nn.ReLU()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -84,9 +86,11 @@ class SentimentClassifier(nn.Module):
     )
 
     output = self.drop(output[1])
-    output2 = self.out(output)
-    output3 = self.out_activation(output2)
-    return output3
+    output = self.out(output)
+    output = self.out_activation(output)
+    output = self.out(output)
+    output = self.out_activation(output)
+    return output
 
 """## Training"""
 
@@ -258,7 +262,7 @@ if __name__ == "__main__":
   EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
-  optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
   loss_fn = nn.CrossEntropyLoss().to(device)
 
   # Main training loop
