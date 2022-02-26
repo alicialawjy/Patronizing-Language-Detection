@@ -263,7 +263,8 @@ if __name__ == "__main__":
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-  loss_fn = nn.CrossEntropyLoss().to(device)
+  #loss_fn = nn.CrossEntropyLoss().to(device)
+  loss_fn = nn.BCELoss().to(device)
 
   # Main training loop
   train_accuracies = []
