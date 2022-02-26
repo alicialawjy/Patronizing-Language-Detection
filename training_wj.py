@@ -304,6 +304,7 @@ if __name__ == "__main__":
     print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
 
     test_acc, test_loss = evaluate(loss_fn, test_data_loader)
+    print("\n")
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
   PATH = "finetuned_roberta_model_downsample.pth"
