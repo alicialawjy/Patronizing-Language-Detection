@@ -317,7 +317,7 @@ if __name__ == "__main__":
     test_acc, test_loss = evaluate(loss_fn, test_data_loader)
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
-  PATH = "finetuned_roberta_model_downsample.pth"
+  PATH = "finetuned_roberta_model_downsample2.pth"
   torch.save(model.state_dict(), PATH)
 
   # print(f'Final Train F1 {train_f1}')
