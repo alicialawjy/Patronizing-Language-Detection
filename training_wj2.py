@@ -74,10 +74,12 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 300)
+    self.out = nn.Linear(768, 400)
     self.out_activation = nn.ReLU()
-    self.out2 = nn.Linear(300, n_classes)
+    self.out2 = nn.Linear(400, 200)
     self.out_activation2 = nn.ReLU()
+    self.out3 = nn.Linear(200, n_classes)
+    self.out_activation3 = nn.ReLU()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -90,6 +92,8 @@ class SentimentClassifier(nn.Module):
     output = self.out_activation(output)
     output = self.out2(output)
     output = self.out_activation2(output)
+    output = self.out3(output)
+    output = self.out_activation3(output)
     return output
 
 """## Training"""
@@ -141,7 +145,7 @@ def train_epoch(
     correct_predictions += torch.sum(preds == targets)
     # print(correct_predictions)
     losses.append(loss.item())
-    print(loss.item())
+    #print(loss.item())
     #print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
 
     target_detach = targets.cpu().detach().numpy()
@@ -157,10 +161,14 @@ def train_epoch(
     #nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
 
-  full_target = np.array(full_target).flatten()
-  full_preds = np.array(full_preds).flatten()
+
+  print("Mean losses: " + str(np.mean(losses)))
+  mean_loss = np.mean(losses)
+
+  full_target = np.array(full_target, dtype=object).flatten()
+  full_preds = np.array(full_preds, dtype=object).flatten()
   # print(classification_report(full_target, full_preds))
-  train_results = {"pred": full_preds, "actual": full_target}
+  train_results = {"pred": full_preds, "actual": full_target, "mean_loss": mean_loss}
   df = pd.DataFrame(train_results)
   try:
     df.to_csv('output-files/train_results.csv')
@@ -188,8 +196,10 @@ def evaluate(loss_fn, test_data_loader):
 
       _, preds = torch.max(outputs, dim=1)
       preds = preds.squeeze()
+      preds = preds.float()
       targets = targets.squeeze()
-      loss = loss_fn(outputs, targets)
+      targets = targets.float()
+      loss = loss_fn(preds, targets)
       loss.requires_grad = True
       losses.append(loss.item())
       target_detach = targets.cpu().detach().numpy()
@@ -201,10 +211,12 @@ def evaluate(loss_fn, test_data_loader):
       # print(classification_report(target_detach.astype(int), preds_detach.astype(int)))
       correct_predictions += torch.sum(preds == targets)
 
-    eval_target = np.array(eval_target).flatten()
-    eval_preds = np.array(eval_preds).flatten()
+    #print("Mean losses: " + str(np.mean(losses)))
+    mean_loss = np.mean(losses)
+    eval_target = np.array(eval_target, dtype=object).flatten()
+    eval_preds = np.array(eval_preds, dtype=object).flatten()
     # print(classification_report(eval_target, eval_preds))
-    eval_results = {"pred": eval_preds, "actual": eval_target}
+    eval_results = {"pred": eval_preds, "actual": eval_target, "mean_loss": mean_loss}
     df = pd.DataFrame(eval_results)
     try:
       df.to_csv('output-files/eval_results.csv')
@@ -239,8 +251,8 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/balanced_datasets/df_upsample_simple_dup.csv', index_col=0)
-  df_test = pd.read_csv('datasets/balanced_datasets/df_test.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
   df_train = df_train.sample(frac=1).reset_index(drop=True)
@@ -264,7 +276,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
+  EPOCHS = 50
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
