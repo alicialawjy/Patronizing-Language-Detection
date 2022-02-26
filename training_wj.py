@@ -161,8 +161,8 @@ def train_epoch(
   print("Mean losses: " + str(np.mean(losses)))
   mean_loss = np.mean(losses)
 
-  full_target = np.array(full_target).flatten()
-  full_preds = np.array(full_preds).flatten()
+  full_target = np.array(full_target, dtype=object).flatten()
+  full_preds = np.array(full_preds, dtype=object).flatten()
   # print(classification_report(full_target, full_preds))
   train_results = {"pred": full_preds, "actual": full_target, "mean_loss": mean_loss}
   df = pd.DataFrame(train_results)
@@ -209,8 +209,8 @@ def evaluate(loss_fn, test_data_loader):
 
     #print("Mean losses: " + str(np.mean(losses)))
     mean_loss = np.mean(losses)
-    eval_target = np.array(eval_target).flatten()
-    eval_preds = np.array(eval_preds).flatten()
+    eval_target = np.array(eval_target, dtype=object).flatten()
+    eval_preds = np.array(eval_preds, dtype=object).flatten()
     # print(classification_report(eval_target, eval_preds))
     eval_results = {"pred": eval_preds, "actual": eval_target, "mean_loss": mean_loss}
     df = pd.DataFrame(eval_results)
@@ -275,7 +275,7 @@ if __name__ == "__main__":
   EPOCHS = 20
 
   model = SentimentClassifier(n_classes=2).to(device)
-  optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
   #loss_fn = nn.CrossEntropyLoss().to(device)
   loss_fn = nn.BCELoss().to(device)
 
