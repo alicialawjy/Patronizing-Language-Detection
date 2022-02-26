@@ -90,10 +90,12 @@ class SentimentClassifier(nn.Module):
     output = self.drop(output[1])
     output = self.out(output)
     output = self.out_activation(output)
+    """
     output = self.out2(output)
     output = self.out_activation2(output)
     output = self.out3(output)
     output = self.out_activation3(output)
+    """
     return output
 
 """## Training"""
