@@ -53,7 +53,7 @@ class MyDataset(Dataset):
       'text': input,
       'input_ids': encoding['input_ids'].flatten(),
       'attention_mask': encoding['attention_mask'].flatten(),
-      'targets': torch.tensor(labels, dtype=torch.long)
+      'targets': torch.tensor(labels, dtype=torch.float)
     }
 
 def create_data_loader(df, tokenizer, batch_size):
@@ -126,6 +126,7 @@ def train_epoch(
 
     _, preds = torch.max(outputs, dim=1)
     preds = preds.squeeze()
+    preds = preds.float()
     # print(f'outputs: {outputs.shape}')
     print(f'preds: {preds.shape}')
     print(f'preds: {preds.dtype}')
