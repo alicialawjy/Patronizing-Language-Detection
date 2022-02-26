@@ -188,7 +188,9 @@ def evaluate(loss_fn, test_data_loader):
 
       _, preds = torch.max(outputs, dim=1)
       preds = preds.squeeze()
+      preds = preds.float()
       targets = targets.squeeze()
+      targets = targets.float()
       loss = loss_fn(outputs, targets)
       loss.requires_grad = True
       losses.append(loss.item())
