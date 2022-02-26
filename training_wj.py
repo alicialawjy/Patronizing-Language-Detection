@@ -191,7 +191,7 @@ def evaluate(loss_fn, test_data_loader):
       preds = preds.float()
       targets = targets.squeeze()
       targets = targets.float()
-      loss = loss_fn(outputs, targets)
+      loss = loss_fn(preds, targets)
       loss.requires_grad = True
       losses.append(loss.item())
       target_detach = targets.cpu().detach().numpy()
