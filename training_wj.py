@@ -53,7 +53,7 @@ class MyDataset(Dataset):
       'text': input,
       'input_ids': encoding['input_ids'].flatten(),
       'attention_mask': encoding['attention_mask'].flatten(),
-      'targets': torch.tensor(labels, dtype=torch.long)
+      'targets': torch.tensor(labels, dtype=torch.float)
     }
 
 def create_data_loader(df, tokenizer, batch_size):
@@ -88,8 +88,8 @@ class SentimentClassifier(nn.Module):
     output = self.drop(output[1])
     output = self.out(output)
     output = self.out_activation(output)
-    output = self.out(output)
-    output = self.out_activation(output)
+    output = self.out2(output)
+    output = self.out_activation2(output)
     return output
 
 """## Training"""
@@ -126,17 +126,22 @@ def train_epoch(
 
     _, preds = torch.max(outputs, dim=1)
     preds = preds.squeeze()
+    preds = preds.float()
+    preds.requires_grad=True
     # print(f'outputs: {outputs.shape}')
-    # print(f'preds: {preds.shape}')
+    #print(f'preds: {preds.shape}')
+    #print(f'preds: {preds.dtype}')
     targets = targets.squeeze()
+    targets.requires_grad=True
     # print(f'target: {targets}')
-    # print(f'target shape: {targets.shape}')
-    loss = loss_fn(outputs, targets)
+    #print(f'target shape: {targets.shape}')
+    #print(f'target shape: {targets.dtype}')
+    loss = loss_fn(preds, targets)
     # loss.requires_grad = True
     correct_predictions += torch.sum(preds == targets)
     # print(correct_predictions)
     losses.append(loss.item())
-    print(loss.item())
+    #print(loss.item())
     #print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
 
     target_detach = targets.cpu().detach().numpy()
@@ -149,8 +154,12 @@ def train_epoch(
     # f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
 
     loss.backward()
-    nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+    #nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
+
+
+  print("Mean losses: " + str(np.mean(losses)))
+  mean_loss = np.mean(losses)
 
   full_target = np.array(full_target).flatten()
   full_preds = np.array(full_preds).flatten()
@@ -183,8 +192,10 @@ def evaluate(loss_fn, test_data_loader):
 
       _, preds = torch.max(outputs, dim=1)
       preds = preds.squeeze()
+      preds = preds.float()
       targets = targets.squeeze()
-      loss = loss_fn(outputs, targets)
+      targets = targets.float()
+      loss = loss_fn(preds, targets)
       loss.requires_grad = True
       losses.append(loss.item())
       target_detach = targets.cpu().detach().numpy()
@@ -196,6 +207,8 @@ def evaluate(loss_fn, test_data_loader):
       # print(classification_report(target_detach.astype(int), preds_detach.astype(int)))
       correct_predictions += torch.sum(preds == targets)
 
+    #print("Mean losses: " + str(np.mean(losses)))
+    mean_loss = np.mean(losses)
     eval_target = np.array(eval_target).flatten()
     eval_preds = np.array(eval_preds).flatten()
     # print(classification_report(eval_target, eval_preds))
@@ -234,7 +247,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
@@ -254,16 +267,17 @@ if __name__ == "__main__":
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-  BATCH_SIZE = 32
+  BATCH_SIZE = 128
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
+  EPOCHS = 50
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
-  loss_fn = nn.CrossEntropyLoss().to(device)
+  #loss_fn = nn.CrossEntropyLoss().to(device)
+  loss_fn = nn.BCELoss().to(device)
 
   # Main training loop
   train_accuracies = []
@@ -290,6 +304,7 @@ if __name__ == "__main__":
     print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
 
     test_acc, test_loss = evaluate(loss_fn, test_data_loader)
+    print("\n")
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
   PATH = "finetuned_roberta_model_downsample.pth"
