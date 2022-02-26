@@ -127,10 +127,12 @@ def train_epoch(
     _, preds = torch.max(outputs, dim=1)
     preds = preds.squeeze()
     preds = preds.float()
+    preds.requires_grad=True
     # print(f'outputs: {outputs.shape}')
     print(f'preds: {preds.shape}')
     print(f'preds: {preds.dtype}')
     targets = targets.squeeze()
+    targets.requires_grad=True
     # print(f'target: {targets}')
     print(f'target shape: {targets.shape}')
     print(f'target shape: {targets.dtype}')
