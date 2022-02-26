@@ -129,8 +129,8 @@ def train_epoch(
     correct_predictions += torch.sum(preds == targets)
     # print(correct_predictions)
     losses.append(loss.item())
-    print(loss.item())
-    print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
+    print(f'loss: {loss.item()}')
+    # print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
 
     target_detach = targets.cpu().detach().numpy()
     preds_detach = preds.cpu().detach().numpy()
@@ -227,7 +227,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
@@ -244,7 +244,7 @@ if __name__ == "__main__":
   print(f"val {df_val['label'].value_counts()}")
 
   # Data Loader
-  PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
+  PRE_TRAINED_MODEL_NAME = 'bert-base-uncased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
   BATCH_SIZE = 32
