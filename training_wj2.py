@@ -74,12 +74,16 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 400)
+    self.out = nn.Linear(768, n_classes)
     self.out_activation = nn.ReLU()
+   
+    """
     self.out2 = nn.Linear(400, 200)
     self.out_activation2 = nn.ReLU()
     self.out3 = nn.Linear(200, n_classes)
     self.out_activation3 = nn.ReLU()
+    """
+    
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
