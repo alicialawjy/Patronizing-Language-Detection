@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = None,
+      max_length = 510,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
