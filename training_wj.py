@@ -88,8 +88,8 @@ class SentimentClassifier(nn.Module):
     output = self.drop(output[1])
     output = self.out(output)
     output = self.out_activation(output)
-    output = self.out(output)
-    output = self.out_activation(output)
+    output = self.out2(output)
+    output = self.out_activation2(output)
     return output
 
 """## Training"""
@@ -149,7 +149,7 @@ def train_epoch(
     # f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
 
     loss.backward()
-    nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+    #nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
 
   full_target = np.array(full_target).flatten()
