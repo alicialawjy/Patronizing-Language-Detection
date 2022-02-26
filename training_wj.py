@@ -164,7 +164,7 @@ def train_epoch(
   full_target = np.array(full_target).flatten()
   full_preds = np.array(full_preds).flatten()
   # print(classification_report(full_target, full_preds))
-  train_results = {"pred": full_preds, "actual": full_target, "mean_loss": mean_loss}
+  train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
     df.to_csv('output-files/train_results.csv')
@@ -212,7 +212,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_target = np.array(eval_target).flatten()
     eval_preds = np.array(eval_preds).flatten()
     # print(classification_report(eval_target, eval_preds))
-    eval_results = {"pred": eval_preds, "actual": eval_target, "mean_loss": mean_loss}
+    eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
       df.to_csv('output-files/eval_results.csv')
@@ -272,7 +272,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
+  EPOCHS = 3
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
