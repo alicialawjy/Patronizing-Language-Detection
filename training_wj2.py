@@ -74,12 +74,13 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, n_classes)
+    self.out = nn.Linear(768, 400)
     self.out_activation = nn.ReLU()
    
-    """
-    self.out2 = nn.Linear(400, 200)
+    
+    self.out2 = nn.Linear(400, n_classes)
     self.out_activation2 = nn.ReLU()
+    """
     self.out3 = nn.Linear(200, n_classes)
     self.out_activation3 = nn.ReLU()
     """
@@ -94,9 +95,9 @@ class SentimentClassifier(nn.Module):
     output = self.drop(output[1])
     output = self.out(output)
     output = self.out_activation(output)
-    """
     output = self.out2(output)
     output = self.out_activation2(output)
+    """
     output = self.out3(output)
     output = self.out_activation3(output)
     """
@@ -277,12 +278,12 @@ if __name__ == "__main__":
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-  BATCH_SIZE = 32
+  BATCH_SIZE = 128
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 50
+  EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
