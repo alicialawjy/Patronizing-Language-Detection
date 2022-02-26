@@ -128,9 +128,11 @@ def train_epoch(
     preds = preds.squeeze()
     # print(f'outputs: {outputs.shape}')
     print(f'preds: {preds.shape}')
+    print(f'preds: {preds.dtype}')
     targets = targets.squeeze()
     # print(f'target: {targets}')
     print(f'target shape: {targets.shape}')
+    print(f'target shape: {targets.dtype}')
     loss = loss_fn(preds, targets)
     # loss.requires_grad = True
     correct_predictions += torch.sum(preds == targets)
