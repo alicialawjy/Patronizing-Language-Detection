@@ -178,7 +178,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target, "mean_loss": mean_loss}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_results.csv')
+    df.to_csv('output-files/train_results2.csv')
   except:
     print('Fail to save')
 
@@ -226,7 +226,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target, "mean_loss": mean_loss}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_results.csv')
+      df.to_csv('output-files/eval_results2.csv')
     except:
       print('Fail to save')
 
