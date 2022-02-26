@@ -151,7 +151,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_max-length.csv')
+    df.to_csv('output-files/train_dropout.csv')
   except:
     print('Fail to save')
 
@@ -195,7 +195,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_max-length.csv')
+      df.to_csv('output-files/eval_dropout.csv')
     except:
       print('Fail to save')
 
