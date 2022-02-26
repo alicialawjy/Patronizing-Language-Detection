@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 200,
+      max_length = None,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -151,7 +151,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_results.csv')
+    df.to_csv('output-files/train_max-length.csv')
   except:
     print('Fail to save')
 
@@ -195,7 +195,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_results.csv')
+      df.to_csv('output-files/eval_max-length.csv')
     except:
       print('Fail to save')
 
@@ -227,7 +227,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
@@ -244,7 +244,7 @@ if __name__ == "__main__":
   print(f"val {df_val['label'].value_counts()}")
 
   # Data Loader
-  PRE_TRAINED_MODEL_NAME = 'bert-base-uncased'
+  PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
   BATCH_SIZE = 32
@@ -252,7 +252,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 100
+  EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
   optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
