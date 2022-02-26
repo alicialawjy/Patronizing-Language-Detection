@@ -247,7 +247,7 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
 
   # Shuffle dataset
