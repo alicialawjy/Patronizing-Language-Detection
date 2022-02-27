@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 200,
+      max_length = 400,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -74,12 +74,12 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 400)
+    self.out = nn.Linear(768, 100)
     self.out_activation = nn.ReLU()
    
     
-    self.out2 = nn.Linear(400, n_classes)
-    self.out_activation2 = nn.ReLU()
+    self.out2 = nn.Linear(100, n_classes)
+    self.out_activation2 = nn.Sigmoid()
     """
     self.out3 = nn.Linear(200, n_classes)
     self.out_activation3 = nn.ReLU()
@@ -120,8 +120,8 @@ def train_epoch(
   correct_predictions = 0
   f1_scores = []
 
-  for param in model.transformer.parameters():
-    param.requires_grad = False 
+  #for param in model.transformer.parameters():
+  #  param.requires_grad = False 
 
   for d in data_loader:
     optimizer.zero_grad()
@@ -258,8 +258,8 @@ if __name__ == "__main__":
   # )
 
   # Read csv files
-  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
-  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
+  df_train = pd.read_csv('datasets/balanced_data/df_upsample_dup_syn.csv', index_col=0)
+  df_test = pd.read_csv('datasets/balanced_data/df_test.csv', index_col=0)
 
   # Shuffle dataset
   df_train = df_train.sample(frac=1).reset_index(drop=True)
