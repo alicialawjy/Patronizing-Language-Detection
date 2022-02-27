@@ -40,7 +40,7 @@ class OlidDataset(Dataset):
       )
     
     encodings['labels'] = torch.tensor(labels)
-
+    print(encodings)
     return encodings
 
   def __len__(self):
@@ -133,9 +133,9 @@ def evaluate(model, tokenizer, data_loader):
 
   with torch.no_grad():
     for data in tqdm(data_loader): 
-
-      labels = data['labels']
-      text = data['texts']
+      print(data)
+      labels = data['label']
+      text = data['text']
 
       pred = predict_condescending(text, tokenizer, model)
       preds.append(pred['prediction'].tolist())
@@ -155,7 +155,8 @@ if __name__ == "__main__":
   # Read the data file
   df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
-  trainset = reader(df_train)
+  print(df_train.iloc)
+  trainset = reader(df_train.iloc)
   testset = reader(df_test)
 
   # BertTokenizer
@@ -170,8 +171,8 @@ if __name__ == "__main__":
     output_dir='./experiment/hate_speech',
     learning_rate = 0.0001,
     logging_steps= 100,
-    per_device_train_batch_size=32,
-    num_train_epochs = 3,
+    per_device_train_batch_size=16,
+    num_train_epochs = 1,
   )
 
   trainer = Trainer_Sentiment_Classification(
