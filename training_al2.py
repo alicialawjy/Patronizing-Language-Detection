@@ -29,17 +29,16 @@ class OlidDataset(Dataset):
     labels = []
 
     for b in batch:
-      texts.append(b['text'])
+      texts.append(str(b['text']))
       labels.append(b['label'])
     
     encodings = self.tokenizer(
-      str(texts), 
+      texts, 
       return_tensors = 'pt',
       add_special_tokens = True,
       padding = True,
-      truncation = True
+      truncation = True,
       )
-    
     encodings['labels'] = torch.tensor(labels)
     return encodings
 
@@ -47,9 +46,7 @@ class OlidDataset(Dataset):
     return len(self.texts)
 
   def __getitem__(self, idx):
-
-    item = {'text': self.texts[idx],
-            'label': self.labels[idx]}
+    item = {'text': self.texts[idx], 'label': self.labels[idx]}
 
     return item
 
@@ -57,15 +54,14 @@ class OlidDataset(Dataset):
 class SentimentClassifier(BertPreTrainedModel):
   def __init__(self, config):
     super().__init__(config)
-
     # Roberta Model
     self.transformer = BertModel(config)
 
     # Dropout and Linear Layer
-    self.projection_a = nn.Sequential(torch.nn.Dropout(0.2), 
-                                      torch.nn.Linear(config.hidden_size, 2))
+    self.drop = nn.Dropout(p=0.2)
+    self.projection_a = nn.Sequential(torch.nn.Dropout(0.2), torch.nn.Linear(768, 2))
 
-    self.activation = nn.Sigmoid()
+    # self.activation = nn.Sigmoid()
     self.init_weights()
 
   def forward(
@@ -93,21 +89,19 @@ class SentimentClassifier(BertPreTrainedModel):
       return_dict=return_dict,
     )
 
-    logits = self.projection_a(output[1])
-    out = self.activation(logits)
-
-    return out
+    logits = self.projection_a(output[1]) # take pooler output layer
+    return logits
 
 class Trainer_Sentiment_Classification(Trainer):
   def compute_loss(self, model, inputs):
     
     # get predictions
+    label = inputs.pop('labels')
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss()
-    label = inputs['labels']
-    loss = loss_fn(outputs.view(-1,2), label.view(-1))
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0]))
+    loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
 
@@ -174,8 +168,9 @@ if __name__ == "__main__":
     model = model,
     args = training_args,
     train_dataset = train_dataset,
-    data_collator = train_dataset.collate_fn
+    data_collator = train_dataset.collate_fn,
   )
+
   trainer.train()
   trainer.save_model('./models/bert_finetuned/')
 
