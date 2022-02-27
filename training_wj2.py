@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 200,
+      max_length = 400,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -79,7 +79,7 @@ class SentimentClassifier(nn.Module):
    
     
     self.out2 = nn.Linear(400, n_classes)
-    self.out_activation2 = nn.ReLU()
+    self.out_activation2 = nn.Sigmoid()
     """
     self.out3 = nn.Linear(200, n_classes)
     self.out_activation3 = nn.ReLU()
@@ -120,8 +120,8 @@ def train_epoch(
   correct_predictions = 0
   f1_scores = []
 
-  for param in model.transformer.parameters():
-    param.requires_grad = False 
+  #for param in model.transformer.parameters():
+  #  param.requires_grad = False 
 
   for d in data_loader:
     optimizer.zero_grad()

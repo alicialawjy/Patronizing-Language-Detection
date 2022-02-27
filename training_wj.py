@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 200,
+      max_length = 400,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -109,8 +109,8 @@ def train_epoch(
   correct_predictions = 0
   f1_scores = []
 
-  for param in model.transformer.parameters():
-    param.requires_grad = False 
+  #for param in model.transformer.parameters():
+  #  param.requires_grad = False 
 
   for d in data_loader:
     optimizer.zero_grad()
