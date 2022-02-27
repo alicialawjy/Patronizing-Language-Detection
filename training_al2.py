@@ -156,7 +156,7 @@ if __name__ == "__main__":
   df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   print(df_train.iloc)
-  trainset = reader(df_train.iloc)
+  trainset = reader(df_train)
   testset = reader(df_test)
 
   # BertTokenizer
