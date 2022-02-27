@@ -33,14 +33,14 @@ class OlidDataset(Dataset):
       labels.append(b['label'])
     
     encodings = self.tokenizer(
-      texts, 
+      str(texts), 
       return_tensors = 'pt',
+      add_special_tokens = True,
       padding = True,
       truncation = True
       )
     
     encodings['labels'] = torch.tensor(labels)
-    print(encodings)
     return encodings
 
   def __len__(self):
@@ -50,9 +50,6 @@ class OlidDataset(Dataset):
 
     item = {'text': self.texts[idx],
             'label': self.labels[idx]}
-
-    input = str(self.texts[idx])
-    labels = self.labels[idx]
 
     return item
 
@@ -133,7 +130,6 @@ def evaluate(model, tokenizer, data_loader):
 
   with torch.no_grad():
     for data in tqdm(data_loader): 
-      print(data)
       labels = data['label']
       text = data['text']
 
@@ -155,7 +151,6 @@ if __name__ == "__main__":
   # Read the data file
   df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
-  print(df_train.iloc)
   trainset = reader(df_train)
   testset = reader(df_test)
 
