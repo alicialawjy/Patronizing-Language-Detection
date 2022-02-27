@@ -74,11 +74,11 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 400)
+    self.out = nn.Linear(768, 100)
     self.out_activation = nn.ReLU()
    
     
-    self.out2 = nn.Linear(400, n_classes)
+    self.out2 = nn.Linear(100, n_classes)
     self.out_activation2 = nn.Sigmoid()
     """
     self.out3 = nn.Linear(200, n_classes)

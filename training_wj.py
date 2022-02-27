@@ -76,8 +76,10 @@ class SentimentClassifier(nn.Module):
     self.drop = nn.Dropout(p=0.1)
     self.out = nn.Linear(768, 300)
     self.out_activation = nn.ReLU()
-    self.out2 = nn.Linear(300, n_classes)
+    self.out2 = nn.Linear(300, 100)
     self.out_activation2 = nn.ReLU()
+    self.out3 = nn.Linear(100, n_classes)
+    self.out_activation3 = nn.Sigmoid()
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
@@ -90,6 +92,8 @@ class SentimentClassifier(nn.Module):
     output = self.out_activation(output)
     output = self.out2(output)
     output = self.out_activation2(output)
+    output = self.out3(output)
+    output = self.out_activation3(output)
     return output
 
 """## Training"""
