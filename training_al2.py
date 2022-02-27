@@ -137,6 +137,13 @@ def evaluate(model, tokenizer, data_loader):
   return report
 
 if __name__ == "__main__":
+  # Fix Device
+  GPU = True
+  if GPU:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device("cpu")
+  print(f"Using {device}")
 
   # Model
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
