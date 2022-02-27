@@ -126,13 +126,13 @@ def train_epoch(
     # print(correct_predictions)
     losses.append(loss.item())
     print(loss.item())
-    print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
+    # print(f'accuracy per batch = {(torch.sum(preds == targets))/32}')
 
     target_detach = targets.cpu().detach().numpy()
     preds_detach = preds.cpu().detach().numpy()
     full_preds.append(preds_detach.astype(int))
     full_target.append(target_detach.astype(int))
-    
+
     # print(target_detach.astype(int))
     # print(preds_detach.astype(int))
     # f1_scores.append(f1_score(target_detach.astype(int), preds_detach.astype(int)))
@@ -148,6 +148,7 @@ def train_epoch(
   df = pd.DataFrame(train_results)
   try:
     df.to_csv('output-files/train_results.csv')
+    print("Successfully saved train results.")
   except:
     print('Fail to save')
 
@@ -181,7 +182,7 @@ def evaluate(loss_fn, test_data_loader):
 
       eval_preds.append(preds_detach.astype(int))
       eval_target.append(target_detach.astype(int))
-  
+
       # print(classification_report(target_detach.astype(int), preds_detach.astype(int)))
       correct_predictions += torch.sum(preds == targets)
 
@@ -192,6 +193,7 @@ def evaluate(loss_fn, test_data_loader):
     df = pd.DataFrame(eval_results)
     try:
       df.to_csv('output-files/eval_results.csv')
+      print("Successfully saved eval results.")
     except:
       print('Fail to save')
 
@@ -222,7 +224,7 @@ if __name__ == "__main__":
     shuffle = True,
     random_state = RANDOM_SEED
   )
-  
+
   print(f"train {df_train['label'].value_counts()}")
   print(f"test {df_test['label'].value_counts()}")
   print(f"val {df_val['label'].value_counts()}")
@@ -236,7 +238,7 @@ if __name__ == "__main__":
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  FINE_TUNE_EPOCHS = 3
+  FINE_TUNE_EPOCHS = 20
   EPOCHS = 100
 
   model = SentimentClassifier(n_classes=2).to(device)
@@ -253,9 +255,10 @@ if __name__ == "__main__":
   test_f1 = []
 
   # Fine tune model
+  print(f"Fine tuning the transformer for {FINE_TUNE_EPOCHS}")
+
   for epoch in tqdm(range(FINE_TUNE_EPOCHS)):
-    print("Fine tuning the transformer")
-    print(f'Epoch {epoch + 1}/{EPOCHS}')
+    print(f'Epoch {epoch + 1}/{FINE_TUNE_EPOCHS}')
     print('-' * 10)
 
     train_acc, train_loss = train_epoch(
@@ -268,30 +271,33 @@ if __name__ == "__main__":
       fine_tune= True
     )
     print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
-    print("--------------------------------------------")
-    print("Finished training the epochs")
-
-  for epoch in tqdm(range(EPOCHS)):
-
-    print(f'Epoch {epoch + 1}/{EPOCHS}')
-    print('-' * 10)
-
-    train_acc, train_loss = train_epoch(
-      model,
-      train_data_loader,
-      loss_fn,
-      optimizer,
-      device,
-      n_examples = len(df_train)
-    )
-    print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
 
     test_acc, test_loss = evaluate(loss_fn, test_data_loader)
     print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
 
+  print("Finished finetuning")
+
+  # for epoch in tqdm(range(EPOCHS)):
+
+  #   print(f'Epoch {epoch + 1}/{EPOCHS}')
+  #   print('-' * 10)
+
+  #   train_acc, train_loss = train_epoch(
+  #     model,
+  #     train_data_loader,
+  #     loss_fn,
+  #     optimizer,
+  #     device,
+  #     n_examples = len(df_train)
+  #   )
+  #   print(f'Epoch{epoch}, Train loss {train_loss},  Train accuracy {train_acc}')
+
+    # test_acc, test_loss = evaluate(loss_fn, test_data_loader)
+    # print(f'Epoch{epoch}, Test loss {test_loss},  Test accuracy {test_acc}')
+
   # PATH = "finetuned_roberta_model_downsample.pth"
   # torch.save(model.state_dict(), PATH)
 
-  print(f'Final Train F1 {train_f1}')
-  print(f'Final Test F1 {test_f1}')
+  # print(f'Final Train F1 {train_f1}')
+  # print(f'Final Test F1 {test_f1}')
 
