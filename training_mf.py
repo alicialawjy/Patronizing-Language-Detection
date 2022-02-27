@@ -2,7 +2,7 @@
 
 from tqdm import tqdm
 import pandas as pd
-from transformers import BertModel, BertTokenizer, RobertaConfig, RobertaModel
+from transformers import BertModel, BertTokenizer, RobertaConfig, RobertaModel, DistilBertModel, DistilBertConfig, DistilBertTokenizer
 import torch
 import torch.nn as nn
 from dont_patronize_me import DontPatronizeMe
@@ -65,8 +65,11 @@ def create_data_loader(df, tokenizer, batch_size):
 class SentimentClassifier(nn.Module):
   def __init__(self, n_classes):
     super(SentimentClassifier, self).__init__()
-    configuration = RobertaConfig()
-    self.transformer = RobertaModel(configuration)
+    # configuration = RobertaConfig()
+    # self.transformer = RobertaModel(configuration)
+
+    configuration = DistilBertConfig()
+    self.transformer = DistilBertModel(configuration)
     self.drop = nn.Dropout(p=0.3)
     self.out = nn.Linear(768, n_classes)
 
@@ -147,7 +150,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_results.csv')
+    df.to_csv('output-files/train_results_distilbert.csv')
     print("Successfully saved train results.")
   except:
     print('Fail to save')
@@ -192,7 +195,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_results.csv')
+      df.to_csv('output-files/eval_results_distilbert.csv')
       print("Successfully saved eval results.")
     except:
       print('Fail to save')
@@ -230,15 +233,17 @@ if __name__ == "__main__":
   print(f"val {df_val['label'].value_counts()}")
 
   # Data Loader
-  PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
-  tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
+  # PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
+  # tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
+
+  tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
   BATCH_SIZE = 32
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  FINE_TUNE_EPOCHS = 20
+  FINE_TUNE_EPOCHS = 10
   EPOCHS = 100
 
   model = SentimentClassifier(n_classes=2).to(device)
