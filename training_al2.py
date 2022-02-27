@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0]))
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
   # Model
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
-  model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME)
+  model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
   df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
