@@ -158,9 +158,9 @@ if __name__ == "__main__":
   # Read the data file
   
 
-  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
-  df_val = pd.read_csv('datasets/df_val.csv', index_col=0)
-  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
+  df_train = pd.read_csv('datasets/updown_data/df_updown_sample.csv', index_col=0)
+  df_val = pd.read_csv('datasets/updown_data/df_val.csv', index_col=0)
+  df_test = pd.read_csv('datasets/updown_data/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
 
