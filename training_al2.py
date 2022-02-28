@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 1.0])).to(device)
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -151,7 +151,7 @@ if __name__ == "__main__":
   model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 3,
+    num_train_epochs = 10,
   )
 
   trainer = Trainer_Sentiment_Classification(
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/downsample_epoch3_lr5/')
+  trainer.save_model('./models/upsample_epoch10_lr5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
