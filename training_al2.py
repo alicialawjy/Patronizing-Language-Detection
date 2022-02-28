@@ -169,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 4,
+    num_train_epochs = 5,
   )
 
   trainer = Trainer_Sentiment_Classification(
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/upsample_epoch4_lr5/')
+  trainer.save_model('./models/upsample_epoch5_lr5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
