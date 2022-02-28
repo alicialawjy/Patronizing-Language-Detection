@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 5.0])).to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -157,8 +157,8 @@ if __name__ == "__main__":
   # Read the data file
   df_train = pd.read_csv('datasets/colab_test_data.csv', index_col=0)
   df_test = pd.read_csv('datasets/colab_train_data.csv', index_col=0)
-  trainset = reader(df_train)
-  testset = reader(df_test)
+  trainset = reader(df_train.sample(frac=1))
+  testset = reader(df_test.sample(frac=1))
 
   # BertTokenizer
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
