@@ -106,7 +106,9 @@ def hyperparam_tuning():
 
 
         print("F1: " + str(f1))
-        param_dict[current_model_no] = [optim, lr, epoch, f1]
+        param_dict[str(current_model_no)] = [optim, lr, epoch, f1]
+
+        current_model_no += 1
 
 
         if f1 >= curr_best_f1:
