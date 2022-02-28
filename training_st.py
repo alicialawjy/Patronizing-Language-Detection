@@ -2,7 +2,7 @@
 from unittest.util import _MAX_LENGTH
 from tqdm import tqdm
 import pandas as pd
-from transformers import RobertaTokenizer, RobertaConfig, RobertaForSequenceClassification, Trainer, TrainingArguments, BertPreTrainedModel, BertModel, BertTokenizer
+#from transformers import RobertaTokenizer, RobertaConfig, RobertaForSequenceClassification, Trainer, TrainingArguments, BertPreTrainedModel, BertModel, BertTokenizer
 import torch
 import torch.nn as nn
 from dont_patronize_me import DontPatronizeMe
