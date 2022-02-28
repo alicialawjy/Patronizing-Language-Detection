@@ -18,6 +18,7 @@ import logging
 import torch
 from collections import Counter
 from ast import literal_eval  
+from sklearn.metrics import f1_score
 
 def reader(df):
   texts = df['text'].values.tolist()
@@ -65,6 +66,64 @@ class OlidDataset(Dataset):
     # return logits
 
 
+def hyperparam_tuning():
+  optimizer = ['AdamW', 'Adam', 'Adagrad']
+  learning_rate = [4e-04, 4e-05, 4e-06]
+  best_model = None
+  f1_score_list  = []
+  current_model_no = 0
+
+  param_dict = {}
+  curr_best_f1 = 0
+  for optim in optimizer:
+    for lr in learning_rate:
+      print("Optim: " + str(optim))
+      print("LR: " + str(lr))
+      model_args = ClassificationArgs(num_train_epochs=1, 
+                                        no_save=True, 
+                                        no_cache=True, 
+                                        overwrite_output_dir=True,
+                                        learning_rate=lr,
+                                        optimizer=optim)
+
+      model = ClassificationModel("roberta", 
+                                    'roberta-base', 
+                                    args = model_args, 
+                                    num_labels=2, 
+                                    use_cuda=cuda_available)
+
+
+      y_true = df_test['label']
+
+      model.train_model(df_train[['text', 'label']])
+      y_pred, _ = model.predict(df_val.text.tolist())
+      print(classification_report(df_test['label'],   y_pred))
+      f1 = f1_score(y_true, y_pred)
+
+
+      print("F1: " + str(f1))
+      param_dict[current_model_no] = [optim, lr, f1]
+
+
+      if f1 >= curr_best_f1:
+        curr_best_f1 = f1
+        best_model = model
+  
+  best_model
+
+  try:
+    df = pd.DataFrame(param_dict)
+    df.to_csv("df_param.csv", orient='index')
+  except:
+    print(param_dict)
+
+  return best_model
+        
+
+
+
+
+
 
 if __name__ == "__main__":
   # Fix Device
@@ -82,16 +141,7 @@ if __name__ == "__main__":
   #configuration = RobertaConfig(vocab_size = 50265)
   #model = SentimentClassifier(configuration).to(device)
   #print(model)
-  model_args = ClassificationArgs(num_train_epochs=1, 
-                                      no_save=True, 
-                                      no_cache=True, 
-                                      overwrite_output_dir=True)
-
-  model = ClassificationModel("roberta", 
-                                  'roberta-base', 
-                                  args = model_args, 
-                                  num_labels=2, 
-                                  use_cuda=cuda_available)
+  
 
   # model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
@@ -99,14 +149,14 @@ if __name__ == "__main__":
   
 
   df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_val = pd.read_csv('datasets/df_val.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
 
-  model.train_model(df_train[['text', 'label']])
-  pred, _ = model.predict(df_test.text.tolist())
-  print(classification_report(df_test['label'],   pred, _ = model.predict(df_test.text.tolist())
-))
 
-
+  model = hyperparam_tuning()
+  y_pred, _ = model.predict(df_val.text.tolist())
+  print(classification_report(df_test['label'],   y_pred))
+  
 
