@@ -169,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 3,
+    num_train_epochs = 10,
   )
 
   trainer = Trainer_Sentiment_Classification(
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/bert_finetuned_weighted_3epoch/')
+  trainer.save_model('./models/bert_finetuned_weighted_10epoch/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
