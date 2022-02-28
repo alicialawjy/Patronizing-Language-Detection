@@ -169,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 1,
+    num_train_epochs = 2,
   )
 
   trainer = Trainer_Sentiment_Classification(
