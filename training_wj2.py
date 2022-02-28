@@ -74,11 +74,11 @@ class SentimentClassifier(nn.Module):
     configuration = RobertaConfig()
     self.transformer = RobertaModel(configuration)
     self.drop = nn.Dropout(p=0.1)
-    self.out = nn.Linear(768, 100)
+    self.out = nn.Linear(768, 768)
     self.out_activation = nn.ReLU()
    
     
-    self.out2 = nn.Linear(100, n_classes)
+    self.out2 = nn.Linear(768, n_classes)
     self.out_activation2 = nn.Sigmoid()
     """
     self.out3 = nn.Linear(200, n_classes)
@@ -286,7 +286,7 @@ if __name__ == "__main__":
   EPOCHS = 10
 
   model = SentimentClassifier(n_classes=2).to(device)
-  optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
   #loss_fn = nn.CrossEntropyLoss().to(device)
   loss_fn = nn.BCELoss().to(device)
 
