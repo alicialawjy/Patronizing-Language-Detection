@@ -8,7 +8,7 @@ Original file is located at
 """
 from tqdm import tqdm
 import pandas as pd
-from transformers import BertModel, BertTokenizer, RobertaConfig, RobertaModel
+from transformers import BertModel, RobertaTokenizer, RobertaConfig, RobertaModel
 import torch
 import torch.nn as nn
 from dont_patronize_me import DontPatronizeMe
@@ -41,7 +41,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 510,
+      max_length = 64,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -112,6 +112,7 @@ def train_epoch(
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
 
+    print(attention_mask.shape)
     outputs = model(
       input_ids=input_ids,
       attention_mask=attention_mask
@@ -151,7 +152,7 @@ def train_epoch(
   train_results = {"pred": full_preds, "actual": full_target}
   df = pd.DataFrame(train_results)
   try:
-    df.to_csv('output-files/train_dropout.csv')
+    df.to_csv('output-files/train_roberta_tokeniser.csv')
   except:
     print('Fail to save')
 
@@ -195,7 +196,7 @@ def evaluate(loss_fn, test_data_loader):
     eval_results = {"pred": eval_preds, "actual": eval_target}
     df = pd.DataFrame(eval_results)
     try:
-      df.to_csv('output-files/eval_dropout.csv')
+      df.to_csv('output-files/eval_roberta_tokeniser.csv')
     except:
       print('Fail to save')
 
@@ -211,13 +212,6 @@ if __name__ == "__main__":
     device = torch.device("cpu")
   print(f"Using {device}")
 
-  # Data
-  # dpm = DontPatronizeMe('.', '.')
-  # dpm = DontPatronizeMe('.', 'dontpatronizeme_pcl.tsv')
-
-  # dpm.load_task1()
-
-  # df = dpm.train_task1_df
 
   RANDOM_SEED = 42
   # df_train, df_test = train_test_split(
@@ -244,21 +238,21 @@ if __name__ == "__main__":
   print(f"val {df_val['label'].value_counts()}")
 
   # Data Loader
-  PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
-  tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
+  PRE_TRAINED_MODEL_NAME = 'roberta-base'
+  tokenizer = RobertaTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME, truncation=True, do_lower_case=True)
+  print(tokenizer)
 
   BATCH_SIZE = 32
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
 
-  EPOCHS = 10
-
   model = SentimentClassifier(n_classes=2).to(device)
-  optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
   loss_fn = nn.CrossEntropyLoss().to(device)
 
   # Main training loop
+  EPOCHS = 10
   train_accuracies = []
   train_losses = []
   train_f1 = []
@@ -266,7 +260,7 @@ if __name__ == "__main__":
   test_accuracies = []
   test_losses = []
   test_f1 = []
-
+  
   for epoch in tqdm(range(EPOCHS)):
 
     print(f'Epoch {epoch + 1}/{EPOCHS}')

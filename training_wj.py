@@ -271,7 +271,7 @@ if __name__ == "__main__":
   PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
   tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
 
-  BATCH_SIZE = 64
+  BATCH_SIZE = 8
   train_data_loader = create_data_loader(df_train, tokenizer, BATCH_SIZE)
   test_data_loader = create_data_loader(df_test, tokenizer, BATCH_SIZE)
   val_data_loader = create_data_loader(df_val, tokenizer, BATCH_SIZE)
