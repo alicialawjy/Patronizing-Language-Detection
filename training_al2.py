@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 5.0])).to(device)
+    loss_fn = nn.CrossEntropyLoss().to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -170,7 +170,7 @@ if __name__ == "__main__":
   # Train
   training_args = TrainingArguments(
     output_dir='./experiment/hate_speech',
-    learning_rate = 1e-5,
+    learning_rate = 4e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
     num_train_epochs = 3,
@@ -184,7 +184,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/colab_weight2_epoch3_lr5/')
+  trainer.save_model('./models/colab_epoch5_lr4e5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
