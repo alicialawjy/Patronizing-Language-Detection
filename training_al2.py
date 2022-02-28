@@ -151,7 +151,7 @@ if __name__ == "__main__":
   model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/upsample_weight2_epoch3_lr4/')
+  trainer.save_model('./models/downsample_weight2_epoch3_lr5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
