@@ -127,7 +127,7 @@ def evaluate(model, tokenizer, data_loader):
       labels = data['label']
       text = data['text']
 
-      pred = predict_condescending(text, tokenizer, model)
+      pred = predict_condescending(text, tokenizer, model).to(device)
       preds.append(pred['prediction'].tolist())
       tot_labels.append(labels.tolist())
 
@@ -165,7 +165,7 @@ if __name__ == "__main__":
   # Train
   training_args = TrainingArguments(
     output_dir='./experiment/hate_speech',
-    learning_rate = 0.0001,
+    learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
     num_train_epochs = 1,
