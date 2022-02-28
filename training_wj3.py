@@ -115,7 +115,7 @@ class Trainer_Sentiment_Classification(Trainer):
 
 def predict_condescending(input,tokenizer,model):
   model.eval()
-  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True).to(device)
+  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True, max_length=128).to(device)
 
   output = model(**encodings).to(device)
   preds = torch.max(output,1)
@@ -163,6 +163,8 @@ if __name__ == "__main__":
   # model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
+  
+
   df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
