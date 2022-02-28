@@ -155,8 +155,8 @@ if __name__ == "__main__":
   model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/colab_train_data.csv', index_col=0)
-  df_test = pd.read_csv('datasets/colab_test_data.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train.sample(frac=1))
   testset = reader(df_test.sample(frac=1))
 
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     learning_rate = 4e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 3,
+    num_train_epochs = 1,
   )
 
   trainer = Trainer_Sentiment_Classification(
@@ -184,7 +184,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/colab_epoch5_lr4e5/')
+  trainer.save_model('./models/downsample_epoch1_lr4e5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
