@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 1.0])).to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/downsample_weight2_epoch3_lr5/')
+  trainer.save_model('./models/downsample_epoch3_lr5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
