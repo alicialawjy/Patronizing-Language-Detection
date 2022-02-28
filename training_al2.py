@@ -8,7 +8,7 @@ from dont_patronize_me import DontPatronizeMe
 import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, classification_report
+from sklearn.metrics import f1_score, classification_report, confusion_matrix
 from torch.utils.data import Dataset, DataLoader
 
 def reader(df):
@@ -133,6 +133,7 @@ def evaluate(model, tokenizer, data_loader):
 
   # with the saved predictions and labels we can compute accuracy, precision, recall and f1-score
   report = classification_report(tot_labels, preds)
+  print(confusion_matrix(tot_labels, preds))
 
   return report
 
@@ -168,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 1,
+    num_train_epochs = 3,
   )
 
   trainer = Trainer_Sentiment_Classification(
