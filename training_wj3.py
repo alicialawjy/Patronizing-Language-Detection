@@ -1,4 +1,5 @@
 
+from unittest.util import _MAX_LENGTH
 from tqdm import tqdm
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaConfig, RobertaForSequenceClassification, Trainer, TrainingArguments, BertPreTrainedModel, BertModel, BertTokenizer
@@ -38,6 +39,7 @@ class OlidDataset(Dataset):
       add_special_tokens = True,
       padding = True,
       truncation = True,
+      max_length= 128
       )
 
     encodings['labels'] = torch.tensor(labels)
