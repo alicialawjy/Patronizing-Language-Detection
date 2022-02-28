@@ -68,8 +68,8 @@ class OlidDataset(Dataset):
 
 def hyperparam_tuning():
   optimizer = ['AdamW']
-  learning_rate = [9e-04, 2e-05, 4e-05]
-  epochs = [1,2,3]
+  learning_rate = [2e-05, 4e-05]
+  epochs = [1, 2,3]
   
   best_model = None
   f1_score_list  = []
@@ -120,6 +120,7 @@ def hyperparam_tuning():
     pass
 
   try:
+    print(param_dict)
     df = pd.DataFrame.from_dict(param_dict)
     print(df)
     df.to_csv("df_param.csv", orient='index')
@@ -157,7 +158,7 @@ if __name__ == "__main__":
   # Read the data file
   
 
-  df_train = pd.read_csv('datasets/balanced_data/df_downsample.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
   df_val = pd.read_csv('datasets/df_val.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
