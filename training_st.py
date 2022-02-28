@@ -80,6 +80,7 @@ def hyperparam_tuning():
   for epoch in epochs:
     for optim in optimizer:
       for lr in learning_rate:
+        print("Total epoch: " + str(epoch))
         print("Optim: " + str(optim))
         print("LR: " + str(lr))
         model_args = ClassificationArgs(num_train_epochs=epoch, 
