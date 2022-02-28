@@ -34,6 +34,7 @@ class OlidDataset(Dataset):
 
     encodings = self.tokenizer(
       texts,
+      max_length = 128,
       return_tensors = 'pt',
       add_special_tokens = True,
       padding = True,
@@ -113,7 +114,12 @@ class Trainer_Sentiment_Classification(Trainer):
 
 def predict_condescending(input,tokenizer,model):
   model.eval()
-  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True).to(device)
+  encodings = tokenizer(
+    input,
+    max_length = 128,
+    return_tensors='pt',
+    padding=True,
+    truncation=True).to(device)
 
   output = model(**encodings).to(device)
   preds = torch.max(output,1)
@@ -161,10 +167,10 @@ if __name__ == "__main__":
   # model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
-  trainset = reader(df_train)
-  testset = reader(df_test)
+  trainset = reader(df_train.iloc[:5])
+  testset = reader(df_test.iloc[:5])
 
   # BertTokenizer
   # tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
@@ -183,7 +189,7 @@ if __name__ == "__main__":
     learning_rate = 4e-5,
     logging_steps= 100,
     per_device_train_batch_size=8,
-    num_train_epochs = 3,
+    num_train_epochs = 1,
   )
 
   trainer = Trainer_Sentiment_Classification(
