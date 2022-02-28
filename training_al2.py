@@ -56,6 +56,7 @@ class SentimentClassifier(BertPreTrainedModel):
     super().__init__(config)
     # Roberta Model
     self.transformer = BertModel(config)
+    
 
     # Dropout and Linear Layer
     self.drop = nn.Dropout(p=0.2)
@@ -94,13 +95,12 @@ class SentimentClassifier(BertPreTrainedModel):
 
 class Trainer_Sentiment_Classification(Trainer):
   def compute_loss(self, model, inputs):
-    
     # get predictions
     label = inputs.pop('labels')
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
+    loss_fn = nn.CrossEntropyLoss().to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -171,9 +171,11 @@ if __name__ == "__main__":
   training_args = TrainingArguments(
     output_dir='./experiment/hate_speech',
     learning_rate = 4e-5,
-    logging_steps= 100,
+    logging_steps= 50,
     per_device_train_batch_size=16,
     num_train_epochs = 1,
+    warmup_ratio = 0.06,
+    optimizer = "AdamW",
   )
 
   trainer = Trainer_Sentiment_Classification(
