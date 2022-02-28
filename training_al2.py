@@ -100,7 +100,7 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 9.53])).to(device)
+    loss_fn = nn.CrossEntropyLoss().to(device) #weight=torch.tensor([1.0, 9.53])
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
-    num_train_epochs = 10,
+    num_train_epochs = 3,
   )
 
   trainer = Trainer_Sentiment_Classification(
@@ -180,7 +180,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/bert_finetuned_weighted_10epoch/')
+  trainer.save_model('./models/bert_finetuned_3epoch/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
