@@ -1,4 +1,5 @@
 
+from unittest.util import _MAX_LENGTH
 from tqdm import tqdm
 import pandas as pd
 from transformers import RobertaTokenizer, RobertaConfig, RobertaForSequenceClassification, Trainer, TrainingArguments, BertPreTrainedModel, BertModel, BertTokenizer
@@ -38,6 +39,7 @@ class OlidDataset(Dataset):
       add_special_tokens = True,
       padding = True,
       truncation = True,
+      max_length= 128
       )
 
     encodings['labels'] = torch.tensor(labels)
@@ -92,9 +94,11 @@ class SentimentClassifier(BertPreTrainedModel):
       output_hidden_states=output_hidden_states,
       return_dict=return_dict,
     )
+    # print(output.logits)
+    return output.logits
 
-    logits = self.projection_a(output[1]) # take pooler output layer
-    return logits
+    # logits = self.projection_a(output[1]) # take pooler output layer
+    # return logits
 
 class Trainer_Sentiment_Classification(Trainer):
   def compute_loss(self, model, inputs):
@@ -111,7 +115,7 @@ class Trainer_Sentiment_Classification(Trainer):
 
 def predict_condescending(input,tokenizer,model):
   model.eval()
-  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True).to(device)
+  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True, max_length=128).to(device)
 
   output = model(**encodings).to(device)
   preds = torch.max(output,1)
@@ -159,6 +163,8 @@ if __name__ == "__main__":
   # model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
+  
+
   df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
@@ -181,7 +187,7 @@ if __name__ == "__main__":
     learning_rate = 4e-5,
     logging_steps= 100,
     per_device_train_batch_size=8,
-    num_train_epochs = 3,
+    num_train_epochs = 1,
   )
 
   trainer = Trainer_Sentiment_Classification(
