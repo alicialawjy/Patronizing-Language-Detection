@@ -69,6 +69,7 @@ class OlidDataset(Dataset):
 def hyperparam_tuning():
   optimizer = ['AdamW', 'Adam', 'Adagrad']
   learning_rate = [4e-04, 4e-05, 4e-06]
+  
   best_model = None
   f1_score_list  = []
   current_model_no = 0
@@ -97,7 +98,7 @@ def hyperparam_tuning():
 
       model.train_model(df_train[['text', 'label']])
       y_pred, _ = model.predict(df_val.text.tolist())
-      print(classification_report(df_test['label'],   y_pred))
+      print(classification_report(df_val['label'],   y_pred))
       f1 = f1_score(y_true, y_pred)
 
 
