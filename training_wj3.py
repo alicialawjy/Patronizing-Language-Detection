@@ -165,8 +165,8 @@ if __name__ == "__main__":
   # Read the data file
   
 
-  df_train = pd.read_csv('datasets/colab_train_data.csv', index_col=0)
-  df_test = pd.read_csv('datasets/colab_test_data.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
 
