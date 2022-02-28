@@ -94,11 +94,11 @@ def hyperparam_tuning():
                                     use_cuda=cuda_available)
 
 
-      y_true = df_test['label']
+      y_true = df_val['label']
 
       model.train_model(df_train[['text', 'label']])
       y_pred, _ = model.predict(df_val.text.tolist())
-      print(classification_report(df_val['label'],   y_pred))
+      print(classification_report(y_true, y_pred))
       f1 = f1_score(y_true, y_pred)
 
 
