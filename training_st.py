@@ -67,8 +67,9 @@ class OlidDataset(Dataset):
 
 
 def hyperparam_tuning():
-  optimizer = ['AdamW', 'Adam', 'Adagrad']
-  learning_rate = [4e-04, 4e-05, 4e-06]
+  optimizer = ['AdamW']
+  learning_rate = [2e-05, 4e-05, 6e-05]
+  epochs = [1,2,3]
   
   best_model = None
   f1_score_list  = []
@@ -76,39 +77,40 @@ def hyperparam_tuning():
 
   param_dict = {}
   curr_best_f1 = 0
-  for optim in optimizer:
-    for lr in learning_rate:
-      print("Optim: " + str(optim))
-      print("LR: " + str(lr))
-      model_args = ClassificationArgs(num_train_epochs=1, 
-                                        no_save=True, 
-                                        no_cache=True, 
-                                        overwrite_output_dir=True,
-                                        learning_rate=lr,
-                                        optimizer=optim)
+  for epoch in epochs:
+    for optim in optimizer:
+      for lr in learning_rate:
+        print("Optim: " + str(optim))
+        print("LR: " + str(lr))
+        model_args = ClassificationArgs(num_train_epochs=epoch, 
+                                          no_save=True, 
+                                          no_cache=True, 
+                                          overwrite_output_dir=True,
+                                          learning_rate=lr,
+                                          optimizer=optim)
 
-      model = ClassificationModel("roberta", 
-                                    'roberta-base', 
-                                    args = model_args, 
-                                    num_labels=2, 
-                                    use_cuda=cuda_available)
-
-
-      y_true = df_val['label']
-
-      model.train_model(df_train[['text', 'label']])
-      y_pred, _ = model.predict(df_val.text.tolist())
-      print(classification_report(y_true, y_pred))
-      f1 = f1_score(y_true, y_pred)
+        model = ClassificationModel("roberta", 
+                                      'roberta-base', 
+                                      args = model_args, 
+                                      num_labels=2, 
+                                      use_cuda=cuda_available)
 
 
-      print("F1: " + str(f1))
-      param_dict[current_model_no] = [optim, lr, f1]
+        y_true = df_val['label']
+
+        model.train_model(df_train[['text', 'label']])
+        y_pred, _ = model.predict(df_val.text.tolist())
+        print(classification_report(y_true, y_pred))
+        f1 = f1_score(y_true, y_pred)
 
 
-      if f1 >= curr_best_f1:
-        curr_best_f1 = f1
-        best_model = model
+        print("F1: " + str(f1))
+        param_dict[current_model_no] = [optim, lr, epoch, f1]
+
+
+        if f1 >= curr_best_f1:
+          curr_best_f1 = f1
+          best_model = model
   
   try:
     torch.save(best_model, "best_model.pt")
