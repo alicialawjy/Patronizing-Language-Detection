@@ -92,9 +92,11 @@ class SentimentClassifier(BertPreTrainedModel):
       output_hidden_states=output_hidden_states,
       return_dict=return_dict,
     )
+    # print(output.logits)
+    return output.logits
 
-    logits = self.projection_a(output[1]) # take pooler output layer
-    return logits
+    # logits = self.projection_a(output[1]) # take pooler output layer
+    # return logits
 
 class Trainer_Sentiment_Classification(Trainer):
   def compute_loss(self, model, inputs):
