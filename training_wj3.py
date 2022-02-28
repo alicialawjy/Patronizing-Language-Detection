@@ -94,7 +94,7 @@ class SentimentClassifier(BertPreTrainedModel):
       output_hidden_states=output_hidden_states,
       return_dict=return_dict,
     )
-    # print(output.logits)
+    #print(output)
     return output.logits
 
     # logits = self.projection_a(output[1]) # take pooler output layer
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     learning_rate = 4e-5,
     logging_steps= 100,
     per_device_train_batch_size=8,
-    num_train_epochs = 1,
+    num_train_epochs = 5,
   )
 
   trainer = Trainer_Sentiment_Classification(
