@@ -109,7 +109,11 @@ def hyperparam_tuning():
         curr_best_f1 = f1
         best_model = model
   
-  best_model
+  try:
+    torch.save(best_model, "best_model.pt")
+
+  except:
+    pass
 
   try:
     df = pd.DataFrame(param_dict)
@@ -156,7 +160,7 @@ if __name__ == "__main__":
 
 
   model = hyperparam_tuning()
-  y_pred, _ = model.predict(df_val.text.tolist())
+  y_pred, _ = model.predict(df_test.text.tolist())
   print(classification_report(df_test['label'],   y_pred))
   
 
