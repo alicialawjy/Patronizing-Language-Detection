@@ -35,7 +35,7 @@ class MyDataset(Dataset):
 
     encoding = tokenizer.encode_plus(
       input,
-      max_length = 200,
+      max_length = 250,
       truncation = True, # truncate examples to max length
       add_special_tokens=True, # Add '[CLS]' and '[SEP]'
       return_token_type_ids=False,
@@ -65,20 +65,23 @@ def create_data_loader(df, tokenizer, batch_size):
 class SentimentClassifier(nn.Module):
   def __init__(self, n_classes):
     super(SentimentClassifier, self).__init__()
-    # configuration = RobertaConfig()
-    # self.transformer = RobertaModel(configuration)
+    configuration = RobertaConfig()
+    self.transformer = RobertaModel(configuration)
 
-    configuration = DistilBertConfig()
-    self.transformer = DistilBertModel(configuration)
+    # configuration = DistilBertConfig()
+    # self.transformer = DistilBertModel(configuration)
     self.drop = nn.Dropout(p=0.3)
     self.out = nn.Linear(768, n_classes)
+
+    print(self)
 
   def forward(self, input_ids, attention_mask):
     output = self.transformer(
       input_ids=input_ids,
-      attention_mask=attention_mask
+      attention_mask=attention_mask,
     )
-
+    # print(output[1].shape) # Batch X 768 under roberta
+    # output = self.drop(output.last_hidden_state) # Batch X Seq Length X Dim
     output = self.drop(output[1])
     return self.out(output)
 
@@ -110,6 +113,8 @@ def train_epoch(
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
+
+    # print(input_ids.shape, attention_mask.shape)
 
     outputs = model(
       input_ids=input_ids,
