@@ -109,8 +109,8 @@ def predict_condescending(input,tokenizer,model):
   model.eval()
   encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True)
 
-  output = model(**encodings)
-  preds = torch.max(output,1)
+  output = model(**encodings).to(device)
+  preds = torch.max(output,1).to(device)
 
   return {'prediction': preds[1], 'confidence': preds[0]}
 
@@ -127,7 +127,7 @@ def evaluate(model, tokenizer, data_loader):
       labels = data['label']
       text = data['text']
 
-      pred = predict_condescending(text, tokenizer, model).to(device)
+      pred = predict_condescending(text, tokenizer, model)
       preds.append(pred['prediction'].tolist())
       tot_labels.append(labels.tolist())
 
