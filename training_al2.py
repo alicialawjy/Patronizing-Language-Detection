@@ -100,14 +100,18 @@ class Trainer_Sentiment_Classification(Trainer):
     outputs = model(**inputs)
 
     # calculate loss
-    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.5])).to(device)
+    loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0])).to(device)
     loss = loss_fn(outputs.view(-1, 2), label.view(-1))
 
     return loss
 
 def predict_condescending(input,tokenizer,model):
   model.eval()
-  encodings = tokenizer(input, return_tensors='pt', padding=True, truncation=True).to(device)
+  encodings = tokenizer(
+    input, 
+    return_tensors='pt', 
+    padding=True, 
+    truncation=True).to(device)
 
   output = model(**encodings).to(device)
   preds = torch.max(output,1)
@@ -151,7 +155,7 @@ if __name__ == "__main__":
   model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/df_upsample_simple_dup.csv', index_col=0)
+  df_train = pd.read_csv('datasets/df_upsample_dup_syn.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train)
   testset = reader(df_test)
@@ -180,7 +184,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/upsample_weight2-5_epoch3_lr5/')
+  trainer.save_model('./models/synonym_weight2_epoch3_lr5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
