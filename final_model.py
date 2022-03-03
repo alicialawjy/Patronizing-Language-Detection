@@ -121,7 +121,7 @@ if __name__ == "__main__":
     
   col_names = df_test.columns
 
-  df_submission = pd.read_csv("datasets/official_test_data/task4_test.tsv", sep='\t', index_col = 0, header = None, names = col_names)
+  df_submission = pd.read_csv("datasets/task4_test.tsv", sep='\t', index_col = 0, header = None, names = col_names)
 
   train_model()
   
