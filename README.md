@@ -2,14 +2,6 @@
 Repository Structure
 ```
 Patronizing-Language-Detection
-├─ .gitignore
-├─ Jupyter
-│  ├─ data_analysis.ipynb
-│  ├─ data_preprocessing.ipynb
-│  ├─ dont_patronize_me.py
-│  └─ part3 analysis
-│     ├─ Part3.1.ipynb
-│     └─ df_test3.1.csv
 ├─ README.md
 ├─ Semeval_2022_Task_4_Demo.ipynb
 ├─ archived
@@ -55,11 +47,6 @@ Patronizing-Language-Detection
 ├─ evaluation.py
 ├─ final_model.py
 ├─ hugging-face-implementation.py
-├─ models
-│  ├─ bert_finetuned
-│  ├─ colab_weight2_epoch3_lr5
-│  └─ downsample_epoch1_lr4e5
-├─ output-files
 ├─ shell_script.sh
 └─ view_result.sh
 ```
