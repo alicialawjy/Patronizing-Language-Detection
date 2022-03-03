@@ -97,15 +97,15 @@ if __name__ == "__main__":
 
     # Synonym Replacement only
     syn_replace = main_synonym(df_train)
-    syn_replace.to_csv('datasets/data_augmentation/minority_augmented/syn_replace.csv')
+    syn_replace.to_csv('datasets/training_data/data_augmentation/minority_augmented/syn_replace.csv')
 
     # Paraphrasing only
     paraphrased = main_para (df_train) # dataframe
-    paraphrased.to_csv('datasets/data_augmentation/minority_augmented/paraphrased.csv')
+    paraphrased.to_csv('datasets/training_data/data_augmentation/minority_augmented/paraphrased.csv')
 
     # Synonym Replacement on Paraphrased Text
     syn_and_para = main_synonym(paraphrased)
-    syn_and_para.to_csv('datasets/data_augmentation/minority_augmented/syn_and_para.csv')
+    syn_and_para.to_csv('datasets/training_data/data_augmentation/minority_augmented/syn_and_para.csv')
 
 
 
