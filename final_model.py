@@ -116,10 +116,10 @@ if __name__ == "__main__":
   cuda_available = torch.cuda.is_available()
 
   df_train = pd.read_csv('datasets/training_data/augmented_data/df_updown_paraphrased.csv', index_col=0)
-  df_val = pd.read_csv('datasets/df_val.csv', index_col=0)
-  df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
+  df_val = pd.read_csv('datasets/validation_data/df_val.csv', index_col=0)
+  df_test = pd.read_csv('datasets/test_data/df_test.csv', index_col=0)
     
-  col_names = df_train.columns
+  col_names = df_test.columns
 
   df_submission = pd.read_csv("datasets/official_test_data/task4_test.tsv", sep='\t', index_col = 0, header = None, names = col_names)
 
