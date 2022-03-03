@@ -154,7 +154,7 @@ if __name__ == "__main__":
   model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/training_data/data_augmentation/df_updown_paraphrased.csv', index_col=0)
+  df_train = pd.read_csv('datasets/training_data/data_sampling/df_upsample.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train.sample(frac=1))
   testset = reader(df_test.sample(frac=1))
@@ -171,8 +171,8 @@ if __name__ == "__main__":
     output_dir='./experiment/hate_speech',
     learning_rate = 1e-5,
     logging_steps= 100,
-    per_device_train_batch_size=16,
-    num_train_epochs = 1,
+    per_device_train_batch_size=8,
+    num_train_epochs = 2,
   )
 
   trainer = Trainer_Sentiment_Classification(
