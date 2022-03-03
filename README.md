@@ -52,27 +52,32 @@ Patronizing-Language-Detection
 ```
 
 The main directories/files of interest include:
-1. datasets directory
+1. datasets directory </br>
 Contains all the datasets used/ explored. 
-- raw_data directory: pure datasets (not modified)
-- training_data directory: 70% of the dataset
-    - xxx_data: see Section 2.1.1 of the report
-    - augmented_data: see Section 2.1.2 of the report
-- validation_data directory: 15% of dataset
-- test_data directory: 15% of dataset
-- official_test_data: dataset used for the competition submission
-
-2. final_model.py
+    - raw_data directory: pure datasets (not modified)
+    - training_data directory: 70% of the dataset
+        - xxx_data: see Section 2.1.1 of the report
+        - augmented_data: see Section 2.1.2 of the report
+    - validation_data directory: 15% of dataset
+    - test_data directory: 15% of dataset
+    - official_test_data: dataset used for the competition submission</br>
+</br>
+2. final_model.py </br>
 Contains the final model used for the final submission.
 
-3. hugging-face-implementation.py
+3. hugging-face-implementation.py </br>
 A sentiment classifier model done using a hugging face RoBERTa model.
 
-4. data_preprocessing.ipynb
+4. data_preprocessing.ipynb </br>
 Jupyter notebook used to do the data split
 
-5. data-augmentation.py
+5. data-augmentation.py </br>
 Python script used to carry out paraphrasing and synonym replacement to upsample minority dataset.
 
-6. data_analysis.ipynb
+6. data_analysis.ipynb </br>
 Jupyter notebook used to do data/ result analysis.
+
+## Authors
+* **Alicia Jiayun Law** - *ajl115@ic.ac.uk*
+* **Chan Mun Fai** - *mc821@ic.ac.uk*
+* **Chua Wei Jie** - *wc1021@ic.ac.uk*
