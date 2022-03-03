@@ -98,7 +98,7 @@ def train_model():
     print("Classification metrics for test set(internal)")
     print(classification_report(df_test['label'],   y_pred))
     
-    # Test Set (Internal)
+    # Test Set (External)
     y_pred, _ = model.predict(df_submission.text.tolist()) 
     labels2file([[k] for k in y_pred], 'task1.txt')
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
   cuda_available = torch.cuda.is_available()
 
-  df_train = pd.read_csv('datasets/data_aug/combined/df_updown_paraphrased.csv', index_col=0)
+  df_train = pd.read_csv('datasets/training_data/augmented_data/df_updown_paraphrased.csv', index_col=0)
   df_val = pd.read_csv('datasets/df_val.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
     
