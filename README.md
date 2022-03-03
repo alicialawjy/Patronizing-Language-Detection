@@ -50,8 +50,7 @@ Patronizing-Language-Detection
 ├─ shell_script.sh
 └─ view_result.sh
 ```
-
-The main directories/files of interest include:
+## Key Files and Directories
 1. datasets directory </br>
 Contains all the datasets used/ explored. 
     - raw_data directory: pure datasets (not modified)
@@ -62,6 +61,7 @@ Contains all the datasets used/ explored.
     - test_data directory: 15% of dataset
     - official_test_data: dataset used for the competition submission</br>
 </br>
+
 2. final_model.py </br>
 Contains the final model used for the final submission.
 

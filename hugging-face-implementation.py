@@ -167,8 +167,8 @@ if __name__ == "__main__":
   test_dataset = OlidDataset(tokenizer, testset)
 
   # Train 
-   # output_dir='./experiment/hate_speech',
   training_args = TrainingArguments(
+    output_dir='./experiment/hate_speech',
     learning_rate = 1e-5,
     logging_steps= 100,
     per_device_train_batch_size=16,
@@ -183,7 +183,7 @@ if __name__ == "__main__":
   )
 
   trainer.train()
-  trainer.save_model('./models/downsample_epoch1_lr4e5/')
+  # trainer.save_model('./models/downsample_epoch1_lr4e5/')
 
   # Evaluate
   test_loader = DataLoader(test_dataset)
