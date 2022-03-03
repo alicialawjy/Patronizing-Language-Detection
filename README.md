@@ -76,12 +76,12 @@ Jupyter notebooks used to run the data analysis mentioned in Section 1 and Secti
 ./install_environment.sh
 ```
 
-3. To run the code </br>
+2. To run the code </br>
 ```
 python3 final_model.py
 ```
 
-4. To run Jupyter Notebook
+3. To run Jupyter Notebook
 ```
 jupyter notebook
 ```
