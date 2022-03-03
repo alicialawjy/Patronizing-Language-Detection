@@ -172,7 +172,7 @@ if __name__ == "__main__":
     learning_rate = 1e-5,
     logging_steps= 50,
     per_device_train_batch_size=16,
-    optimizer = "AdamW",
+    num_train_epochs = 1,
   )
 
   trainer = Trainer_Sentiment_Classification(
