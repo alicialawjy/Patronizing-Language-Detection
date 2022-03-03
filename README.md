@@ -71,12 +71,15 @@ Python script used to carry out paraphrasing and synonym replacement to upsample
 Jupyter notebooks used to run the data analysis mentioned in Section 1 and Section 3 of the report.
 
 ## How to run the code
-
-1. To run the code </br>
+1. (OPTIONAL) - To install the required packages at your current environment
+```
+./install_environment.sh
+```
+3. To run the code </br>
 ```
 python3 final_model.py
 ```
-2. To run Jupyter Notebook
+4. To run Jupyter Notebook
 ```
 jupyter notebook
 ```
