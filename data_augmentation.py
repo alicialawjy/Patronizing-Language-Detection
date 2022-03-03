@@ -93,19 +93,19 @@ def main_synonym(train_df):
 Main Code
 '''
 if __name__ == "__main__":
-    df_train = pd.read_csv('datasets/updown_data/df_train_minority.csv', index_col=0)
+    df_train = pd.read_csv('datasets/intermediate_data/df_train_minority.csv', index_col=0)
 
     # Synonym Replacement only
     syn_replace = main_synonym(df_train)
-    syn_replace.to_csv('datasets/data_aug/syn_replace.csv')
+    syn_replace.to_csv('datasets/data_augmentation/minority_augmented/syn_replace.csv')
 
     # Paraphrasing only
     paraphrased = main_para (df_train) # dataframe
-    paraphrased.to_csv('datasets/data_aug/paraphrased.csv')
+    paraphrased.to_csv('datasets/data_augmentation/minority_augmented/paraphrased.csv')
 
     # Synonym Replacement on Paraphrased Text
     syn_and_para = main_synonym(paraphrased)
-    syn_and_para.to_csv('datasets/data_aug/syn_and_para.csv')
+    syn_and_para.to_csv('datasets/data_augmentation/minority_augmented/syn_and_para.csv')
 
 
 
