@@ -167,7 +167,7 @@ if __name__ == "__main__":
   # model = SentimentClassifier.from_pretrained(PRE_TRAINED_MODEL_NAME).to(device)
 
   # Read the data file
-  df_train = pd.read_csv('datasets/df_downsample.csv', index_col=0)
+  df_train = pd.read_csv('datasets/training_data/data_augmentation/df_updown_paraphrased.csv', index_col=0)
   df_test = pd.read_csv('datasets/df_test.csv', index_col=0)
   trainset = reader(df_train.iloc[:5])
   testset = reader(df_test.iloc[:5])
