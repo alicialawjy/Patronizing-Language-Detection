@@ -14,8 +14,7 @@ Patronizing-Language-Detection
 ├─ datasets
 │  ├─ df_test.csv
 │  ├─ df_val.csv
-│  ├─ official_test_data
-│  │  └─ task4_test.tsv
+│  ├─ task4_test.tsv
 │  ├─ raw_data
 │  │  ├─ dev_semeval_parids-labels.csv
 │  │  ├─ df_preprocessing.csv
@@ -50,10 +49,10 @@ Contains all the datasets used/ explored. Some notes:
         - data-sampling: see Section 2.1.1 of the report
         - data-augmentation: see Section 2.1.2 of the report. </br>
         Subfolder minority-augmented contains only the augmented data (not appended with the full train set). 
-        Final training file is `/datasets/training_data/data-augmentation/df_updown_paraphrased.csv`
-    - df_val: internal validation set (15% of raw dataset).
-    - df_test: internal test set (15% of raw dataset).
-    - official_test_data directory: dataset used for the competition submission</br>
+        Final training set is `/datasets/training_data/data-augmentation/df_updown_paraphrased.csv`
+    - df_val.csv: internal validation set (15% of raw dataset).
+    - df_test.csv: internal test set (15% of raw dataset).
+    - task4_test.tsv: dataset used for the competition submission</br>
 </br>
 
 2. final_model.py </br>
