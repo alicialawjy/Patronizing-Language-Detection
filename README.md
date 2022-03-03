@@ -84,9 +84,9 @@ Jupyter notebook used to do data/ result analysis.
 python3 final_model.py
 ```
 2. To run Jupyter Notebook
-'''
+```
 jupyter notebook
-'''
+```
 
 ## Authors
 * **Alicia Jiayun Law** - *ajl115@ic.ac.uk*
