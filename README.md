@@ -77,6 +77,13 @@ Python script used to carry out paraphrasing and synonym replacement to upsample
 6. data_analysis.ipynb </br>
 Jupyter notebook used to do data/ result analysis.
 
+## How to run the code
+
+1. To run the code </br>
+```
+python3 final_model.py
+```
+
 ## Authors
 * **Alicia Jiayun Law** - *ajl115@ic.ac.uk*
 * **Chan Mun Fai** - *mc821@ic.ac.uk*
